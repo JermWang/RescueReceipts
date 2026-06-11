@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&amp;family=Nunito:wght@500;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    @keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes drift { from { transform: translateX(-30vw); } to { transform: translateX(115vw); } }
+    @keyframes floaty { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    @keyframes stampIn { 0% { transform: scale(1.7) rotate(-16deg); opacity: 0; } 60% { transform: scale(0.92) rotate(-6deg); opacity: 1; } 100% { transform: scale(1) rotate(-8deg); opacity: 1; } }
+    @keyframes bobble { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: #7FD99A; border-radius: 99px; border: 2px solid #fff; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+  <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+</helmet>
+
+<div data-screen-label="Park" style="position: fixed; inset: 0; overflow: hidden; font-family: 'Nunito', sans-serif; color: #1F3038; background: linear-gradient(180deg, #A9E2FF 0%, #CDEFFC 36%, #E3F8E9 58%, #D2F2DA 100%);">
+
+  <!-- drifting clouds -->
+  <div style="position: absolute; top: 7%; left: 0; width: 150px; height: 44px; background: #fff; border-radius: 99px; opacity: 0.9; animation: drift 70s linear -20s infinite; box-shadow: 36px -16px 0 6px #fff, 76px -4px 0 2px #fff;"></div>
+  <div style="position: absolute; top: 16%; left: 0; width: 110px; height: 34px; background: #fff; border-radius: 99px; opacity: 0.75; animation: drift 95s linear -60s infinite; box-shadow: 28px -12px 0 4px #fff;"></div>
+  <div style="position: absolute; top: 3%; left: 0; width: 90px; height: 28px; background: #fff; border-radius: 99px; opacity: 0.6; animation: drift 110s linear -35s infinite; box-shadow: 22px -10px 0 3px #fff;"></div>
+
+  <!-- 3D world -->
+  <canvas ref="{{ canvasRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 1;"></canvas>
+
+  <!-- hover nametag (driven imperatively from the render loop) -->
+  <div ref="{{ tagRef }}" style="position: absolute; display: none; z-index: 5; pointer-events: none; transform: translate(-50%, -100%); background: #fff; border: 3px solid #1F3038; border-radius: 14px; padding: 6px 14px 7px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px; box-shadow: 0 4px 0 #1F3038; white-space: nowrap;"></div>
+
+  <!-- ============ HUD ============ -->
+
+  <!-- logo plaque -->
+  <div style="position: absolute; top: 18px; left: 18px; z-index: 10; background: rgba(255,255,255,0.92); border: 3px solid #1F3038; border-radius: 22px; box-shadow: 0 5px 0 #1F3038; padding: 8px 18px 6px; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+    <img src="uploads/RR-logo.png" alt="RescueReceipts" style="height: 72px; display: block;">
+  </div>
+
+  <!-- top-right counters -->
+  <div style="position: absolute; top: 22px; right: 18px; z-index: 10; display: flex; align-items: center; gap: 12px; animation: popIn 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+    <div title="Live bounty pool" style="display: flex; align-items: center; gap: 9px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 18px 8px 10px;">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #FFC857; border: 2.5px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; box-shadow: inset 0 -3px 0 rgba(31,48,56,0.25);">◎</span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">12.4 <span style="font-size: 13px; color: #4A6470;">SOL POOL</span></span>
+    </div>
+    <div title="Verified adoptions" style="display: none; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;" class="hud-paw-pill"></div>
+    <div style="display: flex; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#1F3038"><circle cx="8" cy="14" r="3.4"></circle><circle cx="16" cy="14" r="3.4"></circle><circle cx="6" cy="8.6" r="2.5"></circle><circle cx="12" cy="7" r="2.6"></circle><circle cx="18" cy="8.6" r="2.5"></circle></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">23 <span style="font-size: 13px; color: #4A6470;">ADOPTED</span></span>
+    </div>
+    <button onClick="{{ toggleSound }}" title="Toggle sound" style="width: 50px; height: 50px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 4px 0 #1F3038; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.1s, box-shadow 0.1s;" style-hover="transform: translateY(-2px); box-shadow: 0 6px 0 #1F3038;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">
+      <sc-if value="{{ soundOn }}" hint-placeholder-val="{{ true }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F3038" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="#1F3038"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9.5 9.5 0 0 1 0 13"></path></svg>
+      </sc-if>
+      <sc-if value="{{ soundOff }}" hint-placeholder-val="{{ false }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F3038" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="#1F3038"></path><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg>
+      </sc-if>
+    </button>
+  </div>
+
+  <!-- bottom hint -->
+  <div style="position: absolute; left: 50%; bottom: 118px; transform: translateX(-50%); z-index: 10; background: rgba(31,48,56,0.78); color: #fff; border-radius: 999px; padding: 7px 20px 8px; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; animation: fadeIn 1s 0.8s both; pointer-events: none;">
+    Tap a pet to read its rescue receipt · drag to look around
+  </div>
+
+  <!-- bottom game menu -->
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; justify-content: center; align-items: flex-end; gap: 14px; padding: 0 16px 26px; flex-wrap: wrap;">
+    <button onClick="{{ openSubmit }}" style="display: flex; align-items: center; gap: 10px; background: #FFC857; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 15px 30px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; color: #1F3038; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; animation: popIn 0.5s 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;" style-hover="transform: translateY(-3px); box-shadow: 0 9px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#1F3038"><circle cx="8" cy="14" r="3.4"></circle><circle cx="16" cy="14" r="3.4"></circle><circle cx="6" cy="8.6" r="2.5"></circle><circle cx="12" cy="7" r="2.6"></circle><circle cx="18" cy="8.6" r="2.5"></circle></svg>
+      Submit Proof
+    </button>
+    <button onClick="{{ openReceipts }}" style="display: flex; align-items: center; gap: 10px; background: #fff; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 15px 26px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; color: #1F3038; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; animation: popIn 0.5s 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;" style-hover="transform: translateY(-3px); box-shadow: 0 9px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F3038" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-2.3-1.6L14.4 21l-2.4-1.6L9.6 21l-2.3-1.6L5 21z" fill="#EAF9EE"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="12" x2="15.5" y2="12"></line><line x1="8.5" y1="16" x2="13" y2="16"></line></svg>
+      Receipts
+    </button>
+    <button onClick="{{ openBounties }}" style="display: flex; align-items: center; gap: 10px; background: #fff; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 15px 26px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; color: #1F3038; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; animation: popIn 0.5s 0.39s cubic-bezier(0.34, 1.56, 0.64, 1) both;" style-hover="transform: translateY(-3px); box-shadow: 0 9px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #FFC857; border: 2.5px solid #1F3038; font-weight: 800; font-size: 14px; box-shadow: inset 0 -3px 0 rgba(31,48,56,0.25);">◎</span>
+      Bounties
+    </button>
+    <button onClick="{{ openHow }}" title="How it works" style="width: 62px; height: 62px; border-radius: 50%; background: #FFC857; border: 3.5px solid #1F3038; box-shadow: 0 6px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #1F3038; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; animation: popIn 0.5s 0.46s cubic-bezier(0.34, 1.56, 0.64, 1) both; display: flex; align-items: center; justify-content: center; padding: 0 0 4px;" style-hover="transform: translateY(-3px); box-shadow: 0 9px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">?</button>
+  </div>
+
+  <!-- terms pebble -->
+  <button onClick="{{ openTerms }}" style="position: absolute; right: 18px; bottom: 26px; z-index: 10; background: rgba(255,255,255,0.85); border: 2.5px solid #1F3038; border-radius: 999px; box-shadow: 0 3px 0 #1F3038; padding: 6px 14px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: #1F3038; cursor: pointer;" style-hover="background: #fff;">Terms</button>
+
+  <!-- ============ LOADING ============ -->
+  <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; z-index: 60; background: linear-gradient(180deg, #BDEBC9 0%, #8FDDA5 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;">
+      <img src="uploads/RR-logo.png" alt="RescueReceipts" style="height: 170px; animation: floaty 2.4s ease-in-out infinite;">
+      <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; color: #1F3038;">{{ loadingText }}</div>
+      <div style="width: 220px; height: 16px; background: rgba(255,255,255,0.6); border: 3px solid #1F3038; border-radius: 99px; overflow: hidden;">
+        <div style="height: 100%; width: {{ loadingPct }}; background: #FFC857; border-radius: 99px; transition: width 0.3s;"></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PET RECEIPT PANEL ============ -->
+  <sc-if value="{{ showPet }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 460px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #7FD99A; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">{{ petName }}'s Receipt</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
+        </div>
+        <div style="padding: 20px 22px 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span style="background: #EAF9EE; border: 2.5px solid #1F3038; border-radius: 999px; padding: 4px 14px; font-weight: 800; font-size: 13px;">{{ petType }}</span>
+              <span style="background: {{ petStatusBg }}; border: 2.5px solid #1F3038; border-radius: 999px; padding: 4px 14px; font-weight: 900; font-size: 13px; letter-spacing: 0.06em;">{{ petStatus }}</span>
+            </div>
+            <div style="border: 3px dashed #3FA868; color: #3FA868; border-radius: 12px; padding: 5px 12px; font-weight: 900; font-size: 13px; letter-spacing: 0.1em; transform: rotate(-8deg); animation: stampIn 0.6s 0.2s both;">VERIFIED</div>
+          </div>
+          <div style="margin-top: 18px; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 15.5px; font-weight: 600;">
+            <span style="color: #4A6470;">Adopter</span><span style="font-weight: 800;">{{ petAdopter }}</span>
+            <span style="color: #4A6470;">Shelter</span><span style="font-weight: 800;">{{ petShelter }}</span>
+            <span style="color: #4A6470;">Location</span><span style="font-weight: 800;">{{ petLocation }}</span>
+            <span style="color: #4A6470;">Adopted</span><span style="font-weight: 800;">{{ petDate }}</span>
+            <span style="color: #4A6470;">Bounty</span><span style="font-weight: 800; color: #8A5E12;">◎ {{ petSol }} SOL</span>
+          </div>
+          <div style="margin-top: 16px; background: #F4FBF6; border: 2.5px dashed #7FD99A; border-radius: 16px; padding: 14px 16px; font-size: 15px; line-height: 1.55; font-weight: 600; color: #33505C;">“{{ petStory }}”</div>
+          <div style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="https://x.com/RescueReceipts" target="_blank" rel="noreferrer" style="flex: 1; min-width: 150px; text-align: center; background: #1F3038; color: #fff; border: 3px solid #1F3038; border-radius: 999px; padding: 11px 18px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; text-decoration: none; box-shadow: 0 4px 0 rgba(31,48,56,0.4);" style-hover="transform: translateY(-2px);">View proof post</a>
+            <sc-if value="{{ petPaid }}" hint-placeholder-val="{{ false }}">
+              <a href="https://explorer.solana.com" target="_blank" rel="noreferrer" style="flex: 1; min-width: 150px; text-align: center; background: #fff; color: #7C3AED; border: 3px solid #1F3038; border-radius: 999px; padding: 11px 18px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; text-decoration: none; box-shadow: 0 4px 0 #1F3038;" style-hover="transform: translateY(-2px);">Payout tx ↗</a>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ SUBMIT PANEL ============ -->
+  <sc-if value="{{ showSubmit }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 580px; max-width: 94vw; max-height: 88vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #FFC857; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">Submit Adoption Proof</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
+        </div>
+
+        <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 44px 30px 48px; text-align: center;">
+            <div style="display: inline-block; border: 4px dashed #3FA868; color: #3FA868; border-radius: 16px; padding: 10px 24px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 0.12em; transform: rotate(-8deg); animation: stampIn 0.6s both;">SUBMITTED</div>
+            <h2 style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; margin: 26px 0 0;">Your proof is in the queue!</h2>
+            <p style="font-size: 16px; font-weight: 600; color: #4A6470; line-height: 1.6; max-width: 400px; margin: 12px auto 0;">Our team reviews every submission by hand. If approved, your pet gets a home in the park and your receipt goes public.</p>
+            <button onClick="{{ closePanel }}" style="margin-top: 26px; background: #7FD99A; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 5px 0 #1F3038; padding: 13px 32px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px; cursor: pointer;" style-hover="transform: translateY(-2px); box-shadow: 0 7px 0 #1F3038;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">Back to the park</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+          <form onSubmit="{{ handleSubmit }}" style="padding: 20px 22px 26px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #F4FBF6; border: 2.5px dashed #7FD99A; border-radius: 14px; padding: 10px 14px; font-size: 13.5px; font-weight: 700; color: #33505C; line-height: 1.5;">Adopt from a shelter → post proof on X and tag @RescueReceipts → drop the link here. Manual review, no promises, real pets only.</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">X handle
+                <input name="x_handle" required placeholder="@username" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Proof post URL
+                <input name="x_post_url" required placeholder="https://x.com/…/status/…" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+              </label>
+            </div>
+            <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Solana wallet
+              <input name="wallet" required placeholder="Your Solana public key" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Pet name
+                <input name="pet_name" required placeholder="Beans" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Pet type
+                <select name="pet_type" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;">
+                  <option value="dog">Dog</option>
+                  <option value="cat">Cat</option>
+                  <option value="rabbit">Rabbit</option>
+                  <option value="bird">Bird</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Adoption date
+                <input name="adoption_date" type="date" required style="border: 3px solid #1F3038; border-radius: 14px; padding: 10px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Shelter (optional)
+                <input name="shelter" placeholder="Happy Tails Rescue" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
+              </label>
+            </div>
+            <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Your story (optional)
+              <textarea name="story" rows="3" maxLength="800" placeholder="Tell us about your new family member…" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none; resize: vertical;" style-focus="border-color: #3FA868; background: #fff;"></textarea>
+            </label>
+            <fieldset style="border: 3px solid #1F3038; border-radius: 16px; padding: 12px 16px 14px; margin: 0; background: #FFFBEF;">
+              <legend style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; padding: 0 8px;">Pinky promises</legend>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">This is my real, adopted pet and my proof post is public</label>
+                <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">I understand every submission is manually reviewed and bounties are not guaranteed</label>
+                <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">Pets are a long-term responsibility — I didn't adopt just for a reward</label>
+              </div>
+            </fieldset>
+            <button type="submit" style="background: #FFC857; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 14px 30px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; cursor: pointer; align-self: center;" style-hover="transform: translateY(-2px); box-shadow: 0 8px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">Send it in ➜</button>
+          </form>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ RECEIPTS PANEL ============ -->
+  <sc-if value="{{ showReceipts }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 620px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #7FD99A; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">Rescue Receipts</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
+        </div>
+        <div style="padding: 18px 20px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 14px; font-weight: 700; color: #4A6470;">Every verified adoption, on the public ledger. Newest first.</div>
+          <sc-for list="{{ receipts }}" as="r" hint-placeholder-count="6">
+            <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 12px 16px; background: linear-gradient(180deg, #FFFFFF 0%, #F4FBF6 100%); box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
+              <div style="width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; background: {{ r.avatarBg }}; border: 3px solid #1F3038; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px;">{{ r.initial }}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ r.name }} <span style="font-size: 13px; font-weight: 700; color: #4A6470;">· {{ r.type }}</span></div>
+                <div style="font-size: 13.5px; font-weight: 700; color: #4A6470; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.adopter }} · {{ r.shelter }} · {{ r.date }}</div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
+                <span style="background: {{ r.statusBg }}; border: 2.5px solid #1F3038; border-radius: 999px; padding: 3px 12px; font-weight: 900; font-size: 11.5px; letter-spacing: 0.06em;">{{ r.status }}</span>
+                <span style="font-weight: 800; font-size: 13.5px; color: #8A5E12;">◎ {{ r.sol }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ BOUNTIES PANEL ============ -->
+  <sc-if value="{{ showBounties }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 540px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #FFC857; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">Bounty Pool</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
+        </div>
+        <div style="padding: 20px 22px 26px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #FFFBEF; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #8A5E12;">◎ 12.4</div>
+              <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN THE POOL</div>
+            </div>
+            <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F4FBF6; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #3FA868;">23</div>
+              <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">BOUNTIES PAID</div>
+            </div>
+            <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F2F0FD; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #7C3AED;">4</div>
+              <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN REVIEW</div>
+            </div>
+          </div>
+          <div style="margin-top: 18px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Starter bounty tiers</div>
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px; border: 3px solid #1F3038; border-radius: 16px; padding: 11px 14px; background: #fff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #FFC857; border: 2.5px solid #1F3038; font-weight: 800; flex-shrink: 0; box-shadow: inset 0 -3px 0 rgba(31,48,56,0.25);">◎</span>
+              <div><div style="font-weight: 800; font-size: 15.5px;">Starter Bounty</div><div style="font-size: 13.5px; font-weight: 700; color: #4A6470;">Small SOL for first food, bedding and vet basics.</div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; border: 3px solid #1F3038; border-radius: 16px; padding: 11px 14px; background: #fff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #7FD99A; border: 2.5px solid #1F3038; font-weight: 800; flex-shrink: 0;">★</span>
+              <div><div style="font-weight: 800; font-size: 15.5px;">Featured Adoption</div><div style="font-size: 13.5px; font-weight: 700; color: #4A6470;">Standout stories get a highlighted spot in the park.</div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; border: 3px solid #1F3038; border-radius: 16px; padding: 11px 14px; background: #fff;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #C9B8F5; border: 2.5px solid #1F3038; font-weight: 800; flex-shrink: 0;">♥</span>
+              <div><div style="font-weight: 800; font-size: 15.5px;">Community Sponsored</div><div style="font-size: 13.5px; font-weight: 700; color: #4A6470;">Funded by sponsors and shelter partners.</div></div>
+            </div>
+          </div>
+          <div style="margin-top: 16px; background: #FFF6F2; border: 2.5px dashed #F07856; border-radius: 14px; padding: 11px 14px; font-size: 13.5px; font-weight: 700; color: #8C4A33; line-height: 1.5;">Bounties are small thank-yous for verified rescues — never payment for adopting. The pool goes up and down; payouts are manual and reviewed.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ HOW IT WORKS PANEL ============ -->
+  <sc-if value="{{ showHow }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 560px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #7FD99A; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">How it works</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
+        </div>
+        <div style="padding: 20px 22px 26px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #F4FBF6;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #7FD99A; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">1</span>
+            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Adopt responsibly</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">From a real shelter or rescue. Long-term care only — no impulse adopting.</div></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #F4FBF6;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #7FD99A; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">2</span>
+            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Post public proof</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">Share your adoption on X and tag @RescueReceipts.</div></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #F4FBF6;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #7FD99A; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">3</span>
+            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Submit your link</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">Drop the post URL + your Solana wallet. A human reviews every one.</div></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #FFFBEF;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #FFC857; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">4</span>
+            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Pet joins the park</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">Approved adoptions get a SOL starter bounty and a forever spot here.</div></div>
+          </div>
+          <button onClick="{{ openSubmit }}" style="margin-top: 6px; background: #FFC857; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 13px 30px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px; cursor: pointer; align-self: center;" style-hover="transform: translateY(-2px); box-shadow: 0 8px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">I adopted — submit proof</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ TERMS PANEL ============ -->
+  <sc-if value="{{ showTerms }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
+      <div onClick="{{ swallow }}" style="position: relative; width: 500px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+        <div style="background: #1F3038; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: #fff;">House rules</div>
+          <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;">✕</button>
+        </div>
+        <div style="padding: 18px 22px 26px; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; gap: 10px; font-size: 14.5px; font-weight: 700; color: #33505C; line-height: 1.5;"><span style="color: #3FA868;">●</span>Every submission is manually reviewed by a human.</div>
+          <div style="display: flex; gap: 10px; font-size: 14.5px; font-weight: 700; color: #33505C; line-height: 1.5;"><span style="color: #3FA868;">●</span>Bounties are never guaranteed and depend on the active pool.</div>
+          <div style="display: flex; gap: 10px; font-size: 14.5px; font-weight: 700; color: #33505C; line-height: 1.5;"><span style="color: #F07856;">●</span>Fake, reused or duplicate proof gets denied. No second chances.</div>
+          <div style="display: flex; gap: 10px; font-size: 14.5px; font-weight: 700; color: #33505C; line-height: 1.5;"><span style="color: #F07856;">●</span>Never adopt an animal just for a bounty.</div>
+          <div style="display: flex; gap: 10px; font-size: 14.5px; font-weight: 700; color: #33505C; line-height: 1.5;"><span style="color: #3FA868;">●</span>Bounties are small support rewards — not compensation for pet ownership.</div>
+          <div style="margin-top: 8px; font-size: 13px; font-weight: 700; color: #4A6470;">Questions? hello@rescuereceipts.xyz · @RescueReceipts</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    panel: null,        // null | 'submit' | 'receipts' | 'bounties' | 'how' | 'terms' | 'pet'
+    petIdx: -1,
+    sound: true,
+    loaded: false,
+    loadCount: 0,
+    submitted: false,
+    webglFail: false,
+  };
+
+  PETS = [
+    { file: 'models/dog_01.glb', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '0.25', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5 },
+    { file: 'models/dog_02.glb', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '0.25', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6 },
+    { file: 'models/cat_01.glb', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '0.20', status: 'VERIFIED', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.8, rot: 0.2, sneaky: true },
+    { file: 'models/cat_02.glb', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '0.20', status: 'VERIFIED', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.78, rot: -0.3, sneaky: true },
+    { file: 'models/bird_01.glb', name: 'Crumb', type: 'Bird · Pigeon', adopter: '@planted_jane', shelter: 'Wing & A Prayer', location: 'Portland, OR', date: 'Apr 30, 2026', sol: '0.15', status: 'PAID', story: 'Rescued with a broken wing. Healed up, refused to leave. Honestly, fair.', pos: [0.1, 0, -0.2], h: 0.45, rot: 0.1 },
+  ];
+
+  EXTRA_LEDGER = [
+    { name: 'Clover', type: 'Rabbit', adopter: '@gardengnome', shelter: 'Bunny Burrow Rescue', date: 'Apr 18, 2026', sol: '0.15', status: 'PAID' },
+    { name: 'Tank', type: 'Dog · Mix', adopter: '@0xtank', shelter: 'Second Chance Shelter', date: 'Apr 9, 2026', sol: '0.25', status: 'PAID' },
+    { name: 'Noodle', type: 'Cat', adopter: '@noodlemom', shelter: 'Alley Cat Allies', date: 'Mar 27, 2026', sol: '0.20', status: 'PAID' },
+  ];
+
+  // ---------- audio ----------
+  blip(freq, dur) {
+    if (!this.state.sound) return;
+    try {
+      this.audioCtx = this.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = this.audioCtx;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq || 660, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime((freq || 660) * 1.4, ctx.currentTime + (dur || 0.12));
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (dur || 0.12));
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + (dur || 0.12) + 0.02);
+    } catch (e) { /* no audio, no problem */ }
+  }
+
+  // ---------- lifecycle ----------
+  componentDidMount() {
+    this.canvasReadyPoll = setInterval(() => {
+      if (window.THREE && window.THREE.GLTFLoader && window.THREE.OrbitControls && this.canvas) {
+        clearInterval(this.canvasReadyPoll);
+        this.initScene();
+      }
+    }, 100);
+    // safety: if CDN never loads, drop the loading screen so HUD is usable
+    this.loadTimeout = setTimeout(() => {
+      if (!this.state.loaded) this.setState({ loaded: true, webglFail: !window.THREE });
+    }, 15000);
+    this.onKey = (e) => { if (e.key === 'Escape') this.setState({ panel: null, petIdx: -1 }); };
+    window.addEventListener('keydown', this.onKey);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.canvasReadyPoll);
+    clearTimeout(this.loadTimeout);
+    window.removeEventListener('keydown', this.onKey);
+    if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.renderer) this.renderer.dispose();
+    if (this.resizeObs) this.resizeObs.disconnect();
+  }
+
+  // ---------- three.js scene ----------
+  initScene() {
+    const THREE = window.THREE;
+    const canvas = this.canvas;
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch (e) {
+      this.setState({ loaded: true, webglFail: true });
+      return;
+    }
+    this.renderer = renderer;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    this.scene = scene;
+
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    camera.position.set(0, 2.0, 7.2);
+    this.camera = camera;
+
+    const controls = new THREE.OrbitControls(camera, canvas);
+    controls.target.set(0, 0.65, 0);
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.maxPolarAngle = Math.PI / 2.15;
+    controls.minPolarAngle = Math.PI / 3.4;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    controls.autoRotate = !reduced;
+    controls.autoRotateSpeed = 0.45;
+    controls.update();
+    this.controls = controls;
+
+    // lights
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xa8dcb4, 0.95));
+    const sun = new THREE.DirectionalLight(0xfff4d6, 1.05);
+    sun.position.set(5, 9, 4);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -8; sun.shadow.camera.right = 8;
+    sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -8;
+    scene.add(sun);
+
+    // ground
+    const ground = new THREE.Mesh(
+      new THREE.CircleGeometry(11, 64),
+      new THREE.MeshLambertMaterial({ color: 0x74d387 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const lawn = new THREE.Mesh(
+      new THREE.CircleGeometry(4.6, 64),
+      new THREE.MeshLambertMaterial({ color: 0x8fe09e })
+    );
+    lawn.rotation.x = -Math.PI / 2;
+    lawn.position.y = 0.01;
+    lawn.receiveShadow = true;
+    scene.add(lawn);
+
+    // set dressing: trees + bushes + flowers
+    const treeSpots = [[-5.6, -3.2], [5.4, -3.6], [-6.4, 1.2], [6.6, 0.8], [-3.4, -5.4], [3.2, -5.8], [0.2, -6.6]];
+    for (const [x, z] of treeSpots) this.addTree(x, z);
+    const bushSpots = [[-4.4, 1.8], [4.6, 2.2], [-2.2, -4.2], [2.6, -4.0], [5.6, -1.4], [-5.8, -1.0]];
+    for (const [x, z] of bushSpots) this.addBush(x, z);
+    const flowerSpots = [[-3.2, 2.6], [3.4, 2.8], [-1.6, 3.4], [1.8, 3.2], [-4.2, -2.2], [4.0, -2.0], [2.4, -2.8], [-2.6, -2.6]];
+    for (const [x, z] of flowerSpots) this.addFlower(x, z);
+
+    // pets
+    this.petObjs = [];
+    const manager = new THREE.LoadingManager();
+    manager.onLoad = () => { if (!this.state.loaded) this.setState({ loaded: true }); };
+    manager.onError = () => { this.setState({ loadCount: this.state.loadCount + 1 }); };
+    const loader = new THREE.GLTFLoader(manager);
+
+    this.PETS.forEach((pet, idx) => {
+      loader.load(pet.file, (gltf) => {
+        const model = gltf.scene;
+        model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+        // normalize to target height, feet on ground
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const s = pet.h / Math.max(size.y, 0.0001);
+        model.scale.setScalar(s);
+        box.setFromObject(model);
+        model.position.y = -box.min.y;
+
+        const group = new THREE.Group();
+        group.add(model);
+        group.position.set(pet.pos[0], 0, pet.pos[2]);
+        group.rotation.y = pet.rot;
+        scene.add(group);
+
+        const mixer = new THREE.AnimationMixer(model);
+        const clips = {};
+        for (const c of gltf.animations) {
+          const short = c.name.includes('|') ? c.name.split('|').pop() : c.name;
+          if (!clips[short]) clips[short] = c;
+        }
+        const obj = {
+          idx, group, mixer, clips,
+          home: new THREE.Vector3(pet.pos[0], 0, pet.pos[2]),
+          state: 'idle',
+          timer: 2 + Math.random() * 5,
+          target: new THREE.Vector3(),
+          current: null,
+          baseScale: 1,
+          hoverT: 0,
+        };
+        this.playClip(obj, this.pickIdle(clips), true);
+        // desync animation start
+        mixer.update(Math.random() * 2);
+        this.petObjs.push(obj);
+      }, undefined, () => { /* missing model: skip quietly */ });
+    });
+
+    // pointer interaction
+    this.raycaster = new THREE.Raycaster();
+    this.pointer = new THREE.Vector2();
+    this.hoverIdx = -1;
+    let downX = 0, downY = 0;
+    canvas.addEventListener('pointermove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      this.pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      this.pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      this.needsRaycast = true;
+    });
+    canvas.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY; });
+    canvas.addEventListener('pointerup', (e) => {
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 8) return;
+      const r = canvas.getBoundingClientRect();
+      this.pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      this.pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      const hit = this.raycastPets();
+      if (hit >= 0) {
+        this.blip(740, 0.14);
+        this.setState({ panel: 'pet', petIdx: hit });
+      }
+    });
+
+    // resize
+    const resize = () => {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    resize();
+    this.resizeObs = new ResizeObserver(resize);
+    this.resizeObs.observe(canvas);
+
+    // loop
+    const clock = new THREE.Clock();
+    const v3 = new THREE.Vector3();
+    const animate = () => {
+      this.raf = requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.1);
+      controls.update();
+
+      const panelOpen = !!this.state.panel;
+      if (this.needsRaycast && !panelOpen) {
+        this.needsRaycast = false;
+        const hit = this.raycastPets();
+        if (hit !== this.hoverIdx) {
+          this.hoverIdx = hit;
+          canvas.style.cursor = hit >= 0 ? 'pointer' : '';
+          if (hit >= 0) this.blip(520, 0.06);
+        }
+      }
+      if (panelOpen && this.hoverIdx !== -1) { this.hoverIdx = -1; canvas.style.cursor = ''; }
+
+      for (const p of this.petObjs) {
+        p.mixer.update(dt);
+        this.updateWander(p, dt);
+        // hover pop
+        const targetT = p.idx === this.hoverIdx ? 1 : 0;
+        p.hoverT += (targetT - p.hoverT) * Math.min(dt * 10, 1);
+        const sc = 1 + p.hoverT * 0.1;
+        p.group.scale.setScalar(sc);
+      }
+
+      // nametag follows hovered pet
+      if (this.tag) {
+        if (this.hoverIdx >= 0) {
+          const p = this.petObjs.find((o) => o.idx === this.hoverIdx);
+          if (p) {
+            const pet = this.PETS[p.idx];
+            v3.set(p.group.position.x, pet.h * 1.25, p.group.position.z).project(camera);
+            const r = canvas.getBoundingClientRect();
+            this.tag.style.left = ((v3.x + 1) / 2) * r.width + 'px';
+            this.tag.style.top = ((-v3.y + 1) / 2) * r.height - 8 + 'px';
+            this.tag.style.display = 'block';
+            this.tag.textContent = pet.name + ' · ' + pet.type;
+          }
+        } else {
+          this.tag.style.display = 'none';
+        }
+      }
+
+      renderer.render(scene, camera);
+    };
+    animate();
+  }
+
+  addTree(x, z) {
+    const THREE = window.THREE;
+    const g = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 0.7, 8), new THREE.MeshLambertMaterial({ color: 0x9a6b48 }));
+    trunk.position.y = 0.35; trunk.castShadow = true; g.add(trunk);
+    const c1 = new THREE.Mesh(new THREE.ConeGeometry(0.85, 1.2, 8), new THREE.MeshLambertMaterial({ color: 0x4fb874 }));
+    c1.position.y = 1.15; c1.castShadow = true; g.add(c1);
+    const c2 = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.0, 8), new THREE.MeshLambertMaterial({ color: 0x5ec984 }));
+    c2.position.y = 1.75; c2.castShadow = true; g.add(c2);
+    const s = 0.85 + Math.random() * 0.5;
+    g.scale.setScalar(s);
+    g.rotation.y = Math.random() * Math.PI;
+    g.position.set(x, 0, z);
+    this.scene.add(g);
+  }
+
+  addBush(x, z) {
+    const THREE = window.THREE;
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 10, 8), new THREE.MeshLambertMaterial({ color: 0x5ec984 }));
+    m.scale.y = 0.7;
+    m.position.set(x, 0.26, z);
+    m.castShadow = true;
+    this.scene.add(m);
+  }
+
+  addFlower(x, z) {
+    const THREE = window.THREE;
+    const colors = [0xffc857, 0xff9eaa, 0xffffff, 0xc9b8f5];
+    const g = new THREE.Group();
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.22, 5), new THREE.MeshLambertMaterial({ color: 0x3fa868 }));
+    stem.position.y = 0.11; g.add(stem);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshLambertMaterial({ color: colors[Math.floor(Math.random() * colors.length)] }));
+    head.position.y = 0.25; g.add(head);
+    g.position.set(x + (Math.random() - 0.5) * 0.6, 0, z + (Math.random() - 0.5) * 0.6);
+    this.scene.add(g);
+  }
+
+  pickIdle(clips) {
+    const idles = ['Idle', 'Idle_2', 'Idle_2_HeadLow'].filter((n) => clips[n]);
+    if (idles.length) return idles[Math.floor(Math.random() * idles.length)];
+    const keys = Object.keys(clips);
+    return keys.find((k) => /idle/i.test(k)) || keys[0];
+  }
+
+  playClip(p, name, instant) {
+    if (!name || !p.clips[name]) return;
+    const action = p.mixer.clipAction(p.clips[name]);
+    if (p.current === action) return;
+    action.reset();
+    if (instant) action.play();
+    else action.fadeIn(0.25).play();
+    if (p.current) p.current.fadeOut(0.25);
+    p.current = action;
+  }
+
+  updateWander(p, dt) {
+    p.timer -= dt;
+    if (p.state === 'idle') {
+      if (p.timer <= 0) {
+        const roll = Math.random();
+        if (roll < 0.45 && p.clips['Walk']) {
+          // pick a new spot near home
+          const a = Math.random() * Math.PI * 2;
+          const rad = 0.5 + Math.random() * 1.1;
+          p.target.set(p.home.x + Math.cos(a) * rad, 0, p.home.z + Math.sin(a) * rad);
+          // keep on the lawn-ish
+          const d = Math.hypot(p.target.x, p.target.z);
+          if (d > 3.8) p.target.multiplyScalar(3.8 / d);
+          p.state = 'walk';
+          this.playClip(p, 'Walk');
+        } else if (roll < 0.7 && p.clips['Eating']) {
+          p.state = 'eat';
+          p.timer = 2.5 + Math.random() * 2;
+          this.playClip(p, 'Eating');
+        } else {
+          p.timer = 3 + Math.random() * 5;
+          this.playClip(p, this.pickIdle(p.clips));
+        }
+      }
+    } else if (p.state === 'walk') {
+      const dx = p.target.x - p.group.position.x;
+      const dz = p.target.z - p.group.position.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 0.06) {
+        p.state = 'idle';
+        p.timer = 3 + Math.random() * 5;
+        this.playClip(p, this.pickIdle(p.clips));
+      } else {
+        const targetRot = Math.atan2(dx, dz);
+        let dr = targetRot - p.group.rotation.y;
+        while (dr > Math.PI) dr -= Math.PI * 2;
+        while (dr < -Math.PI) dr += Math.PI * 2;
+        p.group.rotation.y += dr * Math.min(dt * 5, 1);
+        const speed = 0.45;
+        p.group.position.x += (dx / dist) * speed * dt;
+        p.group.position.z += (dz / dist) * speed * dt;
+      }
+    } else if (p.state === 'eat') {
+      if (p.timer <= 0) {
+        p.state = 'idle';
+        p.timer = 2 + Math.random() * 4;
+        this.playClip(p, this.pickIdle(p.clips));
+      }
+    }
+  }
+
+  raycastPets() {
+    if (!this.petObjs || !this.petObjs.length) return -1;
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    const groups = this.petObjs.map((p) => p.group);
+    const hits = this.raycaster.intersectObjects(groups, true);
+    if (!hits.length) return -1;
+    let obj = hits[0].object;
+    while (obj) {
+      const found = this.petObjs.find((p) => p.group === obj);
+      if (found) return found.idx;
+      obj = obj.parent;
+    }
+    return -1;
+  }
+
+  // ---------- render vals ----------
+  renderVals() {
+    const s = this.state;
+    const pet = s.petIdx >= 0 ? this.PETS[s.petIdx] : null;
+    const statusBg = (st) => st === 'PAID' ? '#FFE9B8' : '#CFF3DA';
+
+    const receipts = [...this.PETS.map((p) => ({
+      name: p.name, type: p.type, adopter: p.adopter, shelter: p.shelter,
+      date: p.date, sol: p.sol + ' SOL', status: p.status,
+      statusBg: statusBg(p.status),
+      initial: p.name[0],
+      avatarBg: p.type.startsWith('Dog') ? '#FFE9B8' : (p.type.startsWith('Cat') ? '#CFF3DA' : '#DCEFFD'),
+    })), ...this.EXTRA_LEDGER.map((p) => ({
+      ...p, sol: p.sol + ' SOL',
+      statusBg: statusBg(p.status),
+      initial: p.name[0],
+      avatarBg: p.type.startsWith('Dog') ? '#FFE9B8' : (p.type.startsWith('Cat') ? '#CFF3DA' : '#F3E3FB'),
+    }))];
+
+    const open = (panel) => () => { this.blip(700, 0.12); this.setState({ panel, petIdx: -1, submitted: false }); };
+
+    return {
+      canvasRef: (el) => { this.canvas = el; },
+      tagRef: (el) => { this.tag = el; },
+
+      showLoading: !s.loaded,
+      loadingText: s.webglFail ? 'The park needs WebGL to render — menus still work!' : 'Opening the park…',
+      loadingPct: s.loaded ? '100%' : '62%',
+
+      soundOn: s.sound,
+      soundOff: !s.sound,
+      toggleSound: () => { const next = !s.sound; this.setState({ sound: next }); if (next) setTimeout(() => this.blip(800, 0.1), 0); },
+
+      openSubmit: open('submit'),
+      openReceipts: open('receipts'),
+      openBounties: open('bounties'),
+      openHow: open('how'),
+      openTerms: open('terms'),
+      closePanel: () => { this.blip(440, 0.1); this.setState({ panel: null, petIdx: -1 }); },
+      swallow: (e) => e.stopPropagation(),
+
+      showPet: s.panel === 'pet' && !!pet,
+      petName: pet ? pet.name : '',
+      petType: pet ? pet.type : '',
+      petAdopter: pet ? pet.adopter : '',
+      petShelter: pet ? pet.shelter : '',
+      petLocation: pet ? pet.location : '',
+      petDate: pet ? pet.date : '',
+      petSol: pet ? pet.sol : '',
+      petStory: pet ? pet.story : '',
+      petStatus: pet ? pet.status : '',
+      petStatusBg: pet ? statusBg(pet.status) : '#fff',
+      petPaid: !!pet && pet.status === 'PAID',
+
+      showSubmit: s.panel === 'submit',
+      submitted: s.submitted,
+      notSubmitted: !s.submitted,
+      handleSubmit: (e) => { e.preventDefault(); this.blip(880, 0.2); this.setState({ submitted: true }); },
+
+      showReceipts: s.panel === 'receipts',
+      receipts,
+
+      showBounties: s.panel === 'bounties',
+      showHow: s.panel === 'how',
+      showTerms: s.panel === 'terms',
+    };
+  }
+}
+</script>
+</body>
+</html>
