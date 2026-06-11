@@ -19,6 +19,93 @@
     @keyframes floaty { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
     @keyframes stampIn { 0% { transform: scale(1.7) rotate(-16deg); opacity: 0; } 60% { transform: scale(0.92) rotate(-6deg); opacity: 1; } 100% { transform: scale(1) rotate(-8deg); opacity: 1; } }
     @keyframes bobble { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+    @keyframes analogWeave { 0%, 100% { transform: translate3d(0,0,0); } 25% { transform: translate3d(0.6px,-0.4px,0); } 50% { transform: translate3d(-0.5px,0.3px,0); } 75% { transform: translate3d(0.3px,0.5px,0); } }
+    @keyframes analogNoise { 0% { background-position: 0 0, 0 0, 0 0; } 100% { background-position: 83px 47px, 0 6px, 7px 0; } }
+    .rr-game-canvas {
+      filter: saturate(1.12) contrast(1.08) brightness(0.985) sepia(0.035);
+    }
+    .rr-analog-fx {
+      position: absolute;
+      inset: -2px;
+      z-index: 98;
+      pointer-events: none;
+      opacity: 0.56;
+      mix-blend-mode: soft-light;
+      background:
+        radial-gradient(circle at 50% 48%, transparent 42%, rgba(30, 22, 12, 0.23) 100%),
+        repeating-linear-gradient(0deg, rgba(12, 20, 24, 0.13) 0 1px, transparent 1px 4px),
+        linear-gradient(90deg, rgba(255, 80, 40, 0.055), transparent 22%, transparent 76%, rgba(40, 180, 255, 0.05));
+      animation: analogWeave 5.8s ease-in-out infinite, analogNoise 1.1s steps(2) infinite;
+    }
+    .rr-analog-fx::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.17;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,0.75) 0 0.7px, transparent 1px),
+        radial-gradient(circle at 73% 42%, rgba(0,0,0,0.75) 0 0.65px, transparent 1px),
+        radial-gradient(circle at 44% 79%, rgba(255,255,255,0.55) 0 0.55px, transparent 1px);
+      background-size: 7px 7px, 11px 11px, 13px 13px;
+    }
+    .rr-analog-fx::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.26;
+      background:
+        linear-gradient(90deg, transparent 0 5%, rgba(255,255,255,0.13) 5.3%, transparent 5.7% 100%),
+        repeating-linear-gradient(180deg, transparent 0 18px, rgba(255,255,255,0.10) 19px, transparent 21px);
+    }
+    .rr-start-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 70;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      animation: fadeIn 0.8s both;
+    }
+    .rr-start-logo {
+      width: min(360px, 74vw);
+      height: auto;
+      filter: drop-shadow(0 10px 18px rgba(31,48,56,0.18));
+    }
+    .rr-start-button {
+      border: 0;
+      background: transparent;
+      color: #1F3038;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 5vw, 54px);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      text-shadow: 0 2px 0 rgba(255,255,255,0.72);
+      padding: 0;
+    }
+    .rr-start-button::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 5px;
+      margin-top: 2px;
+      border-radius: 999px;
+      background: #FFC857;
+      box-shadow: 0 2px 0 #1F3038;
+      transform: scaleX(0.72);
+      transition: transform 0.18s ease;
+    }
+    .rr-start-button:hover::after { transform: scaleX(1); }
+    .rr-start-subcopy {
+      color: #1F3038;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    }
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background: #7FD99A; border-radius: 99px; border: 2px solid #fff; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -34,6 +121,9 @@
       .rr-bottom-menu button { min-width: 190px; justify-content: center !important; padding: 10px 20px !important; font-size: 18px !important; box-shadow: 0 5px 0 #1F3038 !important; }
       .rr-bottom-menu button:last-child { min-width: 0; width: 52px !important; height: 52px !important; padding: 0 0 4px !important; }
       .rr-terms { left: 10px !important; right: auto !important; bottom: 16px !important; }
+      .rr-start-screen { gap: 22px; justify-content: center; }
+      .rr-start-logo { width: min(270px, 78vw); }
+      .rr-start-subcopy { font-size: 11px; letter-spacing: 0.12em; }
     }
   </style>
   <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
@@ -49,20 +139,28 @@
   <div style="position: absolute; top: 3%; left: 0; width: 90px; height: 28px; background: #fff; border-radius: 99px; opacity: 0.6; animation: drift 110s linear -35s infinite; box-shadow: 22px -10px 0 3px #fff;"></div>
 
   <!-- 3D world -->
-  <canvas ref="{{ canvasRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 1;"></canvas>
+  <canvas class="rr-game-canvas" ref="{{ canvasRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; z-index: 1;"></canvas>
 
   <!-- hover nametag (driven imperatively from the render loop) -->
   <div ref="{{ tagRef }}" style="position: absolute; display: none; z-index: 5; pointer-events: none; transform: translate(-50%, -100%); background: #fff; border: 3px solid #1F3038; border-radius: 14px; padding: 6px 14px 7px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px; box-shadow: 0 4px 0 #1F3038; white-space: nowrap;"></div>
 
   <!-- ============ HUD ============ -->
 
+  <sc-if value="{{ showStart }}" hint-placeholder-val="{{ false }}">
+    <div class="rr-start-screen">
+      <img class="rr-start-logo" src="uploads/RR-logo.png" alt="RescueReceipts">
+      <button class="rr-start-button" onClick="{{ startGame }}">Enter park</button>
+      <div class="rr-start-subcopy">rescue receipts live adoption park</div>
+    </div>
+  </sc-if>
+
   <!-- logo plaque -->
-  <div class="rr-logo-plaque" style="position: absolute; top: 18px; left: 18px; z-index: 10; background: rgba(255,255,255,0.92); border: 3px solid #1F3038; border-radius: 22px; box-shadow: 0 5px 0 #1F3038; padding: 8px 18px 6px; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+  <div class="rr-logo-plaque" style="position: absolute; top: 18px; left: 18px; z-index: 10; display: {{ gameBlockDisplay }}; background: rgba(255,255,255,0.92); border: 3px solid #1F3038; border-radius: 22px; box-shadow: 0 5px 0 #1F3038; padding: 8px 18px 6px; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
     <img src="uploads/RR-logo.png" alt="RescueReceipts" style="height: 72px; display: block;">
   </div>
 
   <!-- top-right counters -->
-  <div class="rr-top-hud" style="position: absolute; top: 22px; right: 18px; z-index: 10; display: flex; align-items: center; gap: 12px; animation: popIn 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
+  <div class="rr-top-hud" style="position: absolute; top: 22px; right: 18px; z-index: 10; display: {{ gameFlexDisplay }}; align-items: center; gap: 12px; animation: popIn 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
     <div title="Live bounty pool" style="display: flex; align-items: center; gap: 9px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 18px 8px 10px;">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #FFC857; border: 2.5px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; box-shadow: inset 0 -3px 0 rgba(31,48,56,0.25);">◎</span>
       <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">12.4 <span style="font-size: 13px; color: #4A6470;">SOL POOL</span></span>
@@ -83,12 +181,12 @@
   </div>
 
   <!-- bottom hint -->
-  <div class="rr-bottom-hint" style="position: absolute; left: 50%; bottom: 118px; transform: translateX(-50%); z-index: 10; background: rgba(31,48,56,0.78); color: #fff; border-radius: 999px; padding: 7px 20px 8px; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; animation: fadeIn 1s 0.8s both; pointer-events: none;">
+  <div class="rr-bottom-hint" style="position: absolute; left: 50%; bottom: 118px; transform: translateX(-50%); z-index: 10; display: {{ gameBlockDisplay }}; background: rgba(31,48,56,0.78); color: #fff; border-radius: 999px; padding: 7px 20px 8px; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; animation: fadeIn 1s 0.8s both; pointer-events: none;">
     Tap a pet to read its rescue receipt · drag to look around
   </div>
 
   <!-- bottom game menu -->
-  <div class="rr-bottom-menu" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; justify-content: center; align-items: flex-end; gap: 14px; padding: 0 16px 26px; flex-wrap: wrap;">
+  <div class="rr-bottom-menu" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; display: {{ gameFlexDisplay }}; justify-content: center; align-items: flex-end; gap: 14px; padding: 0 16px 26px; flex-wrap: wrap;">
     <button onClick="{{ openSubmit }}" style="display: flex; align-items: center; gap: 10px; background: #FFC857; border: 3.5px solid #1F3038; border-radius: 999px; box-shadow: 0 6px 0 #1F3038; padding: 15px 30px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 21px; color: #1F3038; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; animation: popIn 0.5s 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;" style-hover="transform: translateY(-3px); box-shadow: 0 9px 0 #1F3038;" style-active="transform: translateY(3px); box-shadow: 0 1px 0 #1F3038;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="#1F3038"><circle cx="8" cy="14" r="3.4"></circle><circle cx="16" cy="14" r="3.4"></circle><circle cx="6" cy="8.6" r="2.5"></circle><circle cx="12" cy="7" r="2.6"></circle><circle cx="18" cy="8.6" r="2.5"></circle></svg>
       Submit Proof
@@ -105,7 +203,7 @@
   </div>
 
   <!-- terms pebble -->
-  <button class="rr-terms" onClick="{{ openTerms }}" style="position: absolute; right: 18px; bottom: 26px; z-index: 10; background: rgba(255,255,255,0.85); border: 2.5px solid #1F3038; border-radius: 999px; box-shadow: 0 3px 0 #1F3038; padding: 6px 14px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: #1F3038; cursor: pointer;" style-hover="background: #fff;">Terms</button>
+  <button class="rr-terms" onClick="{{ openTerms }}" style="position: absolute; right: 18px; bottom: 26px; z-index: 10; display: {{ gameBlockDisplay }}; background: rgba(255,255,255,0.85); border: 2.5px solid #1F3038; border-radius: 999px; box-shadow: 0 3px 0 #1F3038; padding: 6px 14px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; color: #1F3038; cursor: pointer;" style-hover="background: #fff;">Terms</button>
 
   <!-- ============ LOADING ============ -->
   <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
@@ -348,6 +446,8 @@
     </div>
   </sc-if>
 
+  <div class="rr-analog-fx" aria-hidden="true"></div>
+
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -360,18 +460,18 @@ class Component extends DCLogic {
     loadCount: 0,
     submitted: false,
     webglFail: false,
+    started: false,
   };
 
   PETS = [
     { file: 'models/dog_01.glb', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '0.25', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5 },
     { file: 'models/dog_02.glb', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '0.25', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6 },
-    { file: 'models/cat_01.glb', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '0.20', status: 'VERIFIED', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.8, rot: 0.2, sneaky: true },
-    { file: 'models/cat_02.glb', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '0.20', status: 'VERIFIED', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.78, rot: -0.3, sneaky: true },
+    { file: 'models/cat.glb', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '0.20', status: 'VERIFIED', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: Math.PI, sneaky: true },
+    { file: 'models/cat.glb', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '0.20', status: 'VERIFIED', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: Math.PI, sneaky: true },
     { file: 'models/bird_01.glb', name: 'Crumb', type: 'Bird · Pigeon', adopter: '@planted_jane', shelter: 'Wing & A Prayer', location: 'Portland, OR', date: 'Apr 30, 2026', sol: '0.15', status: 'PAID', story: 'Rescued with a broken wing. Healed up, refused to leave. Honestly, fair.', pos: [0.1, 0, -0.2], h: 0.45, rot: 0.1 },
-    { file: 'models/dog.glb', name: 'Ranger', type: 'Dog · Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '0.25', status: 'VERIFIED', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9 },
-    { file: 'models/cat.glb', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '0.20', status: 'VERIFIED', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, sneaky: true },
+    { file: 'models/dog.glb', name: 'Ranger', type: 'Dog · Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '0.25', status: 'VERIFIED', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI },
+    { file: 'models/cat.glb', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '0.20', status: 'VERIFIED', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: Math.PI, sneaky: true },
     { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '0.10', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5 },
-    { file: 'models/butterfly.glb', name: 'Flutter', type: 'Butterfly', adopter: '@gardenfriend', shelter: 'Pollinator Patch', location: 'San Diego, CA', date: 'Jun 10, 2026', sol: '0.05', status: 'VERIFIED', story: 'A tiny park trinket for every soft landing and second chance.', pos: [1.7, 0, -2.1], h: 0.08, rot: -0.2, flutter: true },
   ];
 
   EXTRA_LEDGER = [
@@ -532,6 +632,7 @@ class Component extends DCLogic {
           state: 'idle',
           timer: 2 + Math.random() * 5,
           target: new THREE.Vector3(),
+          faceOffset: pet.faceOffset || 0,
           current: null,
           baseScale: 1,
           hoverT: 0,
@@ -732,7 +833,7 @@ class Component extends DCLogic {
         p.timer = 3 + Math.random() * 5;
         this.playClip(p, this.pickIdle(p.clips));
       } else {
-        const targetRot = Math.atan2(dx, dz);
+        const targetRot = Math.atan2(dx, dz) + (p.faceOffset || 0);
         let dr = targetRot - p.group.rotation.y;
         while (dr > Math.PI) dr -= Math.PI * 2;
         while (dr < -Math.PI) dr += Math.PI * 2;
@@ -791,12 +892,19 @@ class Component extends DCLogic {
       tagRef: (el) => { this.tag = el; },
 
       showLoading: !s.loaded,
+      showStart: s.loaded && !s.started,
+      gameBlockDisplay: s.started ? 'block' : 'none',
+      gameFlexDisplay: s.started ? 'flex' : 'none',
       loadingText: s.webglFail ? 'The park needs WebGL to render — menus still work!' : 'Opening the park…',
       loadingPct: s.loaded ? '100%' : '62%',
 
       soundOn: s.sound,
       soundOff: !s.sound,
       toggleSound: () => { const next = !s.sound; this.setState({ sound: next }); if (next) setTimeout(() => this.blip(800, 0.1), 0); },
+      startGame: () => {
+        this.setState({ started: true, panel: null, petIdx: -1 });
+        setTimeout(() => this.blip(760, 0.14), 0);
+      },
 
       openSubmit: open('submit'),
       openReceipts: open('receipts'),
@@ -806,7 +914,7 @@ class Component extends DCLogic {
       closePanel: () => { this.blip(440, 0.1); this.setState({ panel: null, petIdx: -1 }); },
       swallow: (e) => e.stopPropagation(),
 
-      showPet: s.panel === 'pet' && !!pet,
+      showPet: s.started && s.panel === 'pet' && !!pet,
       petName: pet ? pet.name : '',
       petType: pet ? pet.type : '',
       petAdopter: pet ? pet.adopter : '',
@@ -819,17 +927,17 @@ class Component extends DCLogic {
       petStatusBg: pet ? statusBg(pet.status) : '#fff',
       petPaid: !!pet && pet.status === 'PAID',
 
-      showSubmit: s.panel === 'submit',
+      showSubmit: s.started && s.panel === 'submit',
       submitted: s.submitted,
       notSubmitted: !s.submitted,
       handleSubmit: (e) => { e.preventDefault(); this.blip(880, 0.2); this.setState({ submitted: true }); },
 
-      showReceipts: s.panel === 'receipts',
+      showReceipts: s.started && s.panel === 'receipts',
       receipts,
 
-      showBounties: s.panel === 'bounties',
-      showHow: s.panel === 'how',
-      showTerms: s.panel === 'terms',
+      showBounties: s.started && s.panel === 'bounties',
+      showHow: s.started && s.panel === 'how',
+      showTerms: s.started && s.panel === 'terms',
     };
   }
 }

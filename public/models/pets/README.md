@@ -1,17 +1,16 @@
 # Pet 3D models
 
-Drop Quaternius low-poly animated GLB files here:
+Active model mapping:
 
 ```
-dog_01.glb
-dog_02.glb
-cat_01.glb
-cat_02.glb
-rabbit_01.glb
-bird_01.glb
+dog_01.glb      dog
+dog_02.glb      dog
+dog.glb         dog
+cat_02.glb      dog/wolf
+cat.glb         cat
+bird_01.glb     bird
+chichen.glb     chicken
 ```
 
-If a model is missing the site will render a procedural fallback pet — nothing
-will crash. Filenames are matched in `src/lib/petModelConfig.ts`.
-
-See the project root `README.md` for the full asset pipeline.
+The old fox-like `cat_01.glb` asset was removed and should not be assigned to
+cats. Filenames are matched in `src/lib/petModelConfig.ts`.

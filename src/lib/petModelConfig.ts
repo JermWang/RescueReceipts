@@ -14,11 +14,10 @@ export const PET_MODELS: Record<string, PetModelEntry[]> = {
   dog: [
     { id: "dog_01", label: "Shiba Inu", path: "/models/pets/dog_01.glb", scale: 1, idleAnimation: "Idle" },
     { id: "dog_02", label: "Husky", path: "/models/pets/dog_02.glb", scale: 1, idleAnimation: "Idle" },
+    { id: "cat_02", label: "Wolf", path: "/models/pets/cat_02.glb", scale: 0.95, idleAnimation: "Idle" },
     { id: "dog", label: "Rescue Mix", path: "/models/pets/dog.glb", scale: 0.9, idleAnimation: "iddle" },
   ],
   cat: [
-    { id: "cat_01", label: "Cat", path: "/models/pets/cat_01.glb", scale: 0.95, idleAnimation: "Idle" },
-    { id: "cat_02", label: "Cat", path: "/models/pets/cat_02.glb", scale: 0.95, idleAnimation: "Idle" },
     { id: "cat", label: "Tabby", path: "/models/pets/cat.glb", scale: 0.8, idleAnimation: "Idle" },
   ],
   rabbit: [
