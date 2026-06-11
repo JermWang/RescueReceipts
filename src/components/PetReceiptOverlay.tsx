@@ -28,7 +28,7 @@ export function PetReceiptOverlay({ open, receipt, onClose }: { open: boolean; r
                 <h3 className="font-display text-2xl mt-1">{receipt.pet_name}</h3>
                 <div className="text-sm text-ink-soft mt-0.5 capitalize">{receipt.pet_type}</div>
               </div>
-              <span className={`stamp text-warm-orange animate-stamp`}>Verified</span>
+              <span className="stamp text-soft-greenDark animate-stamp">Verified</span>
             </div>
 
             <div className="my-4 divider-paw" />

@@ -1,5 +1,13 @@
 import type { PoolStats } from "@/lib/queries";
 
+const ACCENTS = [
+  "text-sol-purple",
+  "text-gold-deep",
+  "text-soft-greenDark",
+  "text-warm-orangeDark",
+  "text-ink",
+];
+
 export function StatsGrid({ stats }: { stats: PoolStats }) {
   const items = [
     { label: "Total SOL allocated", value: `${stats.totalSol.toFixed(2)} SOL` },
@@ -10,10 +18,10 @@ export function StatsGrid({ stats }: { stats: PoolStats }) {
   ];
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-      {items.map((it) => (
-        <div key={it.label} className="rounded-2xl bg-white/70 border border-ink/10 p-4">
-          <div className="text-2xl font-display">{it.value}</div>
-          <div className="text-xs text-ink-soft mt-1">{it.label}</div>
+      {items.map((it, i) => (
+        <div key={it.label} className="card-tile !p-4 text-center sm:text-left">
+          <div className={`text-2xl font-display font-bold ${ACCENTS[i % ACCENTS.length]}`}>{it.value}</div>
+          <div className="text-xs text-ink-soft mt-1 font-bold">{it.label}</div>
         </div>
       ))}
       {!stats.configured && (

@@ -52,7 +52,7 @@ export function SubmitForm() {
   if (done) {
     return (
       <div className="receipt-card receipt-edge p-8 text-center">
-        <div className="mx-auto stamp text-warm-orange animate-stamp w-fit">Submitted</div>
+        <div className="mx-auto stamp text-soft-greenDark animate-stamp w-fit">Submitted</div>
         <h2 className="mt-4 font-display text-2xl">Your adoption proof was submitted.</h2>
         <p className="text-ink-soft mt-2 max-w-md mx-auto">
           Our team will review it manually. If approved, your pet may appear in the Adoption Park and your adoption receipt will become public.
@@ -92,8 +92,8 @@ export function SubmitForm() {
         <textarea name="story" rows={4} className="input" placeholder="Tell us about your new family member…" maxLength={800} />
       </div>
 
-      <fieldset className="rounded-2xl border border-ink/10 bg-cream-50/70 p-4">
-        <legend className="px-2 text-sm font-semibold">Required confirmations</legend>
+      <fieldset className="rounded-2xl border-[1.5px] border-soft-green/40 bg-cream-100/70 p-4">
+        <legend className="px-2 text-sm font-display font-bold">Required confirmations</legend>
         <div className="grid gap-2">
           {REQUIRED_CONFIRMATIONS.map((c, i) => (
             <label key={i} className="flex items-start gap-2 text-sm text-ink-soft">
@@ -105,7 +105,7 @@ export function SubmitForm() {
                   next[i] = e.target.checked;
                   setConfirmations(next);
                 }}
-                className="mt-1 accent-warm-orange"
+                className="mt-1 accent-soft-greenDark"
               />
               <span>{c}</span>
             </label>

@@ -5,8 +5,9 @@ export const metadata = { title: `Terms & Responsible Adoption — ${SITE.name}`
 export default function TermsPage() {
   return (
     <div className="section py-10 max-w-3xl prose-sm">
-      <h1 className="font-display text-3xl sm:text-4xl">Terms & Responsible Adoption</h1>
-      <p className="text-ink-soft mt-2">Plain language. No tricks. Last updated on first deploy.</p>
+      <div className="chip-gold">Plain language</div>
+      <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold">Terms & Responsible Adoption</h1>
+      <p className="text-ink-soft mt-2 text-lg">Plain language. No tricks. Last updated on first deploy.</p>
 
       <section className="mt-8 space-y-4 text-ink-soft text-sm">
         <Item title="Bounties are not guaranteed.">
@@ -43,8 +44,8 @@ export default function TermsPage() {
 
 function Item({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-ink/10 bg-white/70 p-4">
-      <div className="font-semibold text-ink">{title}</div>
+    <div className="card-tile !p-4">
+      <div className="font-display font-bold text-ink">{title}</div>
       <p className="mt-1">{children}</p>
     </div>
   );

@@ -7,8 +7,9 @@ export default function HowItWorksPage() {
   return (
     <div className="section py-10 max-w-3xl">
       <header>
-        <h1 className="font-display text-3xl sm:text-4xl">How it works</h1>
-        <p className="text-ink-soft mt-2">
+        <div className="chip-green">Six steps · Human reviewed</div>
+        <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold">How it works</h1>
+        <p className="text-ink-soft mt-2 text-lg">
           A simple human-reviewed process. No bots, no auto-payouts, no surprises.
         </p>
       </header>
@@ -22,10 +23,10 @@ export default function HowItWorksPage() {
           { t: "Approved receipt", d: "If approved, your receipt becomes public and your pet may appear in the Adoption Park." },
           { t: "SOL bounty if available", d: "A small SOL bounty is sent manually if funds are available. Transaction signatures are linked publicly." },
         ].map((s, i) => (
-          <li key={i} className="rounded-2xl border border-ink/10 bg-white/70 p-5 flex gap-4">
-            <div className="text-warm-orange font-display text-3xl w-10 shrink-0">{i + 1}</div>
+          <li key={i} className="card-tile flex gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold font-display text-xl font-bold text-ink shadow-popSm">{i + 1}</div>
             <div>
-              <div className="font-semibold">{s.t}</div>
+              <div className="font-display font-bold text-lg">{s.t}</div>
               <p className="text-sm text-ink-soft mt-1">{s.d}</p>
             </div>
           </li>
