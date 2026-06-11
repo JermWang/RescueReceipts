@@ -223,14 +223,14 @@
 
   <!-- top-right counters -->
   <div class="rr-top-hud" style="position: absolute; top: 22px; right: 18px; z-index: 10; display: {{ gameFlexDisplay }}; align-items: center; gap: 12px; animation: popIn 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
-    <div title="Live bounty pool" style="display: flex; align-items: center; gap: 9px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 18px 8px 12px;">
+    <div title="Live creator fee balance" style="display: flex; align-items: center; gap: 9px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 18px 8px 12px;">
       <img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
-      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">12.4 <span style="font-size: 13px; color: #4A6470;">SOL POOL</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ hudPoolSol }} <span style="font-size: 13px; color: #4A6470;">CREATOR FEES</span></span>
     </div>
     <div title="Verified adoptions" style="display: none; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;" class="hud-paw-pill"></div>
     <div style="display: flex; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#1F3038"><circle cx="8" cy="14" r="3.4"></circle><circle cx="16" cy="14" r="3.4"></circle><circle cx="6" cy="8.6" r="2.5"></circle><circle cx="12" cy="7" r="2.6"></circle><circle cx="18" cy="8.6" r="2.5"></circle></svg>
-      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">27 <span style="font-size: 13px; color: #4A6470;">ADOPTED</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ hudAdopted }} <span style="font-size: 13px; color: #4A6470;">ADOPTED</span></span>
     </div>
     <button onClick="{{ toggleSound }}" title="Toggle sound" style="width: 50px; height: 50px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 4px 0 #1F3038; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.1s, box-shadow 0.1s;" style-hover="transform: translateY(-2px); box-shadow: 0 6px 0 #1F3038;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">
       <sc-if value="{{ soundOn }}" hint-placeholder-val="{{ true }}">
@@ -307,7 +307,7 @@
             <span style="color: #4A6470;">Shelter</span><span style="font-weight: 800;">{{ petShelter }}</span>
             <span style="color: #4A6470;">Location</span><span style="font-weight: 800;">{{ petLocation }}</span>
             <span style="color: #4A6470;">Adopted</span><span style="font-weight: 800;">{{ petDate }}</span>
-            <span style="color: #4A6470;">Bounty</span><span style="font-weight: 800; color: #8A5E12;">◎ {{ petSol }} SOL</span>
+            <span style="color: #4A6470;">Bounty</span><span style="font-weight: 800; color: #8A5E12;">{{ petBountyLabel }}</span>
           </div>
           <div style="margin-top: 16px; background: #F4FBF6; border: 2.5px dashed #7FD99A; border-radius: 16px; padding: 14px 16px; font-size: 15px; line-height: 1.55; font-weight: 600; color: #33505C;">“{{ petStory }}”</div>
           <div style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -416,7 +416,7 @@
               </div>
               <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
                 <span style="background: {{ r.statusBg }}; border: 2.5px solid #1F3038; border-radius: 999px; padding: 3px 12px; font-weight: 900; font-size: 11.5px; letter-spacing: 0.06em;">{{ r.status }}</span>
-                <span style="font-weight: 800; font-size: 13.5px; color: #8A5E12;">◎ {{ r.sol }}</span>
+                <span style="font-weight: 800; font-size: 13.5px; color: #8A5E12;">{{ r.sol }}</span>
               </div>
             </div>
           </sc-for>
@@ -430,21 +430,21 @@
     <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
       <div onClick="{{ swallow }}" style="position: relative; width: 540px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
         <div style="background: #FFC857; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
-          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">Bounty Pool</div>
+          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">Creator Fees</div>
           <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
         </div>
         <div style="padding: 20px 22px 26px;">
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #FFFBEF; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #1F3038;"><img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;">12.4</div>
-              <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN THE POOL</div>
+              <div style="display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #1F3038;"><img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;">{{ hudPoolSol }}</div>
+              <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">CREATOR FEES</div>
             </div>
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F4FBF6; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #3FA868;">23</div>
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #3FA868;">{{ hudPaid }}</div>
               <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">BOUNTIES PAID</div>
             </div>
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F2F0FD; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #7C3AED;">4</div>
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #7C3AED;">{{ hudReview }}</div>
               <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN REVIEW</div>
             </div>
           </div>
@@ -541,22 +541,26 @@ class Component extends DCLogic {
     started: false,
     contractAddress: '',
     contractCopied: false,
+    poolSol: '0',
+    adoptedCount: 0,
+    paidCount: 0,
+    reviewCount: 0,
   };
 
   PETS = [
-    { file: 'models/dog_01.glb', modelId: 'shiba_wolf_rig', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '3.20', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5, faceOffset: 0, speed: 0.44, wanderRadius: 1.2, walkChance: 0.5, eatChance: 0.18, idleMin: 2.7, idleMax: 6.2 },
-    { file: 'models/dog_02.glb', modelId: 'husky_wolf_rig', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '3.75', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6, faceOffset: 0, speed: 0.5, wanderRadius: 1.45, walkChance: 0.56, eatChance: 0.1, idleMin: 2.2, idleMax: 5.6 },
-    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '2.65', status: 'PAID', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: 0, speed: 0.36, wanderRadius: 0.95, walkChance: 0.42, eatChance: 0.12, idleMin: 3.4, idleMax: 7.4, sneaky: true },
-    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '3.10', status: 'PAID', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: 0, speed: 0.38, wanderRadius: 0.9, walkChance: 0.46, eatChance: 0.14, idleMin: 2.8, idleMax: 6.6, sneaky: true },
-    { file: 'models/dog.glb', modelId: 'rescue_mix_new_rig', name: 'Ranger', type: 'Dog · Rescue Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '3.45', status: 'PAID', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI, speed: 0.42, wanderRadius: 1.05, walkChance: 0.48, eatChance: 0.18, idleMin: 3.0, idleMax: 6.8 },
-    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '2.95', status: 'PAID', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: 0, speed: 0.34, wanderRadius: 0.85, walkChance: 0.4, eatChance: 0.16, idleMin: 3.6, idleMax: 8.0, sneaky: true },
-    { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '2.10', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5, faceOffset: Math.PI, speed: 0.28, wanderRadius: 0.72, walkChance: 0.5, eatChance: 0.22, idleMin: 2.5, idleMax: 6.0 },
+    { file: 'models/dog_01.glb', modelId: 'shiba_wolf_rig', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5, faceOffset: 0, speed: 0.44, wanderRadius: 1.2, walkChance: 0.5, eatChance: 0.18, idleMin: 2.7, idleMax: 6.2 },
+    { file: 'models/dog_02.glb', modelId: 'husky_wolf_rig', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6, faceOffset: 0, speed: 0.5, wanderRadius: 1.45, walkChance: 0.56, eatChance: 0.1, idleMin: 2.2, idleMax: 5.6 },
+    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '', status: 'PAID', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: 0, speed: 0.36, wanderRadius: 0.95, walkChance: 0.42, eatChance: 0.12, idleMin: 3.4, idleMax: 7.4, sneaky: true },
+    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '', status: 'PAID', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: 0, speed: 0.38, wanderRadius: 0.9, walkChance: 0.46, eatChance: 0.14, idleMin: 2.8, idleMax: 6.6, sneaky: true },
+    { file: 'models/dog.glb', modelId: 'rescue_mix_new_rig', name: 'Ranger', type: 'Dog · Rescue Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '', status: 'PAID', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI, speed: 0.42, wanderRadius: 1.05, walkChance: 0.48, eatChance: 0.18, idleMin: 3.0, idleMax: 6.8 },
+    { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '', status: 'PAID', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: 0, speed: 0.34, wanderRadius: 0.85, walkChance: 0.4, eatChance: 0.16, idleMin: 3.6, idleMax: 8.0, sneaky: true },
+    { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5, faceOffset: Math.PI, speed: 0.28, wanderRadius: 0.72, walkChance: 0.5, eatChance: 0.22, idleMin: 2.5, idleMax: 6.0 },
   ];
 
   EXTRA_LEDGER = [
-    { name: 'Clover', type: 'Rabbit', adopter: '@gardengnome', shelter: 'Bunny Burrow Rescue', date: 'Apr 18, 2026', sol: '2.25', status: 'PAID' },
-    { name: 'Tank', type: 'Dog · Mix', adopter: '@0xtank', shelter: 'Second Chance Shelter', date: 'Apr 9, 2026', sol: '4.00', status: 'PAID' },
-    { name: 'Noodle', type: 'Cat', adopter: '@noodlemom', shelter: 'Alley Cat Allies', date: 'Mar 27, 2026', sol: '2.80', status: 'PAID' },
+    { name: 'Clover', type: 'Rabbit', adopter: '@gardengnome', shelter: 'Bunny Burrow Rescue', date: 'Apr 18, 2026', sol: '', status: 'PAID' },
+    { name: 'Tank', type: 'Dog · Mix', adopter: '@0xtank', shelter: 'Second Chance Shelter', date: 'Apr 9, 2026', sol: '', status: 'PAID' },
+    { name: 'Noodle', type: 'Cat', adopter: '@noodlemom', shelter: 'Alley Cat Allies', date: 'Mar 27, 2026', sol: '', status: 'PAID' },
   ];
 
   assetUrl(path) {
@@ -666,6 +670,15 @@ class Component extends DCLogic {
       .then((cfg) => {
         if (cfg && typeof cfg.contractAddress === 'string') {
           this.setState({ contractAddress: cfg.contractAddress.trim() });
+        }
+        const st = cfg && cfg.stats;
+        if (st) {
+          this.setState({
+            poolSol: String(Math.round(Number(st.poolSol) * 100) / 100),
+            adoptedCount: Number(st.adopted) || 0,
+            paidCount: Number(st.paid) || 0,
+            reviewCount: Number(st.inReview) || 0,
+          });
         }
       })
       .catch(() => {});
@@ -1090,15 +1103,16 @@ class Component extends DCLogic {
     const s = this.state;
     const pet = s.petIdx >= 0 ? this.PETS[s.petIdx] : null;
     const statusBg = (st) => st === 'PAID' ? '#FFE9B8' : '#CFF3DA';
+    const bountyLabel = (amount) => amount ? ('◎ ' + amount + ' SOL') : 'Demo only';
 
     const receipts = [...this.PETS.map((p) => ({
       name: p.name, type: p.type, adopter: p.adopter, shelter: p.shelter,
-      date: p.date, sol: p.sol + ' SOL', status: p.status,
+      date: p.date, sol: bountyLabel(p.sol), status: p.status,
       statusBg: statusBg(p.status),
       initial: p.name[0],
       avatarBg: p.type.startsWith('Dog') ? '#FFE9B8' : (p.type.startsWith('Cat') ? '#CFF3DA' : '#DCEFFD'),
     })), ...this.EXTRA_LEDGER.map((p) => ({
-      ...p, sol: p.sol + ' SOL',
+      ...p, sol: bountyLabel(p.sol),
       statusBg: statusBg(p.status),
       initial: p.name[0],
       avatarBg: p.type.startsWith('Dog') ? '#FFE9B8' : (p.type.startsWith('Cat') ? '#CFF3DA' : '#F3E3FB'),
@@ -1116,6 +1130,10 @@ class Component extends DCLogic {
       gameFlexDisplay: s.started ? 'flex' : 'none',
       loadingText: s.webglFail ? 'The park needs WebGL to render — menus still work!' : 'Opening the park…',
       loadingPct: s.loaded ? '100%' : '62%',
+      hudPoolSol: s.poolSol,
+      hudAdopted: s.adoptedCount,
+      hudPaid: s.paidCount,
+      hudReview: s.reviewCount,
       contractDisplay: this.shortAddress(s.contractAddress),
       contractTitle: s.contractAddress ? 'Click to copy contract address' : 'Contract address coming soon',
       contractCopyLabel: s.contractAddress ? (s.contractCopied ? 'Copied' : 'Copy') : 'Soon',
@@ -1152,7 +1170,7 @@ class Component extends DCLogic {
       petShelter: pet ? pet.shelter : '',
       petLocation: pet ? pet.location : '',
       petDate: pet ? pet.date : '',
-      petSol: pet ? pet.sol : '',
+      petBountyLabel: pet ? bountyLabel(pet.sol) : '',
       petStory: pet ? pet.story : '',
       petStatus: pet ? pet.status : '',
       petStatusBg: pet ? statusBg(pet.status) : '#fff',
