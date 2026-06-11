@@ -126,9 +126,9 @@
       .rr-start-subcopy { font-size: 11px; letter-spacing: 0.12em; }
     }
   </style>
-  <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://unpkg.com/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="./vendor/three-0.147/three.min.js?v=20260611d"></script>
+  <script src="./vendor/three-0.147/OrbitControls.js?v=20260611d"></script>
+  <script src="./vendor/three-0.147/GLTFLoader.js?v=20260611d"></script>
 </helmet>
 
 <div data-screen-label="Park" style="position: fixed; inset: 0; overflow: hidden; font-family: 'Nunito', sans-serif; color: #1F3038; background: linear-gradient(180deg, #A9E2FF 0%, #CDEFFC 36%, #E3F8E9 58%, #D2F2DA 100%);">
@@ -148,7 +148,7 @@
 
   <sc-if value="{{ showStart }}" hint-placeholder-val="{{ false }}">
     <div class="rr-start-screen">
-      <img class="rr-start-logo" src="uploads/RR-logo.png" alt="RescueReceipts">
+      <img class="rr-start-logo" src="uploads/RR-logo.png?v=20260611d" alt="RescueReceipts">
       <button class="rr-start-button" onClick="{{ startGame }}">Enter park</button>
       <div class="rr-start-subcopy">rescue receipts live adoption park</div>
     </div>
@@ -156,7 +156,7 @@
 
   <!-- logo plaque -->
   <div class="rr-logo-plaque" style="position: absolute; top: 18px; left: 18px; z-index: 10; display: {{ gameBlockDisplay }}; background: rgba(255,255,255,0.92); border: 3px solid #1F3038; border-radius: 22px; box-shadow: 0 5px 0 #1F3038; padding: 8px 18px 6px; animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
-    <img src="uploads/RR-logo.png" alt="RescueReceipts" style="height: 72px; display: block;">
+    <img src="uploads/RR-logo.png?v=20260611d" alt="RescueReceipts" style="height: 72px; display: block;">
   </div>
 
   <!-- top-right counters -->
@@ -208,7 +208,7 @@
   <!-- ============ LOADING ============ -->
   <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
     <div style="position: absolute; inset: 0; z-index: 60; background: linear-gradient(180deg, #BDEBC9 0%, #8FDDA5 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;">
-      <img src="uploads/RR-logo.png" alt="RescueReceipts" style="height: 170px; animation: floaty 2.4s ease-in-out infinite;">
+      <img src="uploads/RR-logo.png?v=20260611d" alt="RescueReceipts" style="height: 170px; animation: floaty 2.4s ease-in-out infinite;">
       <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; color: #1F3038;">{{ loadingText }}</div>
       <div style="width: 220px; height: 16px; background: rgba(255,255,255,0.6); border: 3px solid #1F3038; border-radius: 99px; overflow: hidden;">
         <div style="height: 100%; width: {{ loadingPct }}; background: #FFC857; border-radius: 99px; transition: width 0.3s;"></div>
@@ -452,6 +452,8 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  ASSET_VERSION = '20260611d';
+
   state = {
     panel: null,        // null | 'submit' | 'receipts' | 'bounties' | 'how' | 'terms' | 'pet'
     petIdx: -1,
@@ -464,14 +466,14 @@ class Component extends DCLogic {
   };
 
   PETS = [
-    { file: 'models/dog_01.glb', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '0.25', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5 },
-    { file: 'models/dog_02.glb', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '0.25', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6 },
-    { file: 'models/cat.glb', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '0.20', status: 'VERIFIED', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: Math.PI, sneaky: true },
-    { file: 'models/cat.glb', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '0.20', status: 'VERIFIED', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: Math.PI, sneaky: true },
-    { file: 'models/bird_01.glb', name: 'Crumb', type: 'Bird · Pigeon', adopter: '@planted_jane', shelter: 'Wing & A Prayer', location: 'Portland, OR', date: 'Apr 30, 2026', sol: '0.15', status: 'PAID', story: 'Rescued with a broken wing. Healed up, refused to leave. Honestly, fair.', pos: [0.1, 0, -0.2], h: 0.45, rot: 0.1 },
-    { file: 'models/dog.glb', name: 'Ranger', type: 'Dog · Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '0.25', status: 'VERIFIED', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI },
-    { file: 'models/cat.glb', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '0.20', status: 'VERIFIED', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: Math.PI, sneaky: true },
-    { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '0.10', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5 },
+    { file: 'models/dog_01.glb', name: 'Biscuit', type: 'Dog · Shiba', adopter: '@maria_adopts', shelter: 'Happy Tails Rescue', location: 'Austin, TX', date: 'May 12, 2026', sol: '0.25', status: 'PAID', story: 'Biscuit was the last of his litter at the shelter. Now he owns my couch, my bed, and my heart.', pos: [-2.1, 0, 0.4], h: 1.0, rot: 0.5, faceOffset: Math.PI, speed: 0.44, wanderRadius: 1.2, walkChance: 0.5, eatChance: 0.18, idleMin: 2.7, idleMax: 6.2 },
+    { file: 'models/dog_02.glb', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '0.25', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6, faceOffset: Math.PI, speed: 0.5, wanderRadius: 1.45, walkChance: 0.56, eatChance: 0.1, idleMin: 2.2, idleMax: 5.6 },
+    { file: 'models/cat.glb', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '0.20', status: 'VERIFIED', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: Math.PI, speed: 0.36, wanderRadius: 0.95, walkChance: 0.42, eatChance: 0.12, idleMin: 3.4, idleMax: 7.4, sneaky: true },
+    { file: 'models/cat.glb', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '0.20', status: 'VERIFIED', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: Math.PI, speed: 0.38, wanderRadius: 0.9, walkChance: 0.46, eatChance: 0.14, idleMin: 2.8, idleMax: 6.6, sneaky: true },
+    { file: 'models/bird_01.glb', name: 'Crumb', type: 'Bird · Pigeon', adopter: '@planted_jane', shelter: 'Wing & A Prayer', location: 'Portland, OR', date: 'Apr 30, 2026', sol: '0.15', status: 'PAID', story: 'Rescued with a broken wing. Healed up, refused to leave. Honestly, fair.', pos: [0.1, 0, -0.2], h: 0.45, rot: 0.1, speed: 0.32, wanderRadius: 0.8, walkChance: 0.36, eatChance: 0.2, idleMin: 3.2, idleMax: 7.8 },
+    { file: 'models/dog.glb', name: 'Ranger', type: 'Dog · Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '0.25', status: 'VERIFIED', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI, speed: 0.42, wanderRadius: 1.05, walkChance: 0.48, eatChance: 0.18, idleMin: 3.0, idleMax: 6.8 },
+    { file: 'models/cat.glb', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '0.20', status: 'VERIFIED', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: Math.PI, speed: 0.34, wanderRadius: 0.85, walkChance: 0.4, eatChance: 0.16, idleMin: 3.6, idleMax: 8.0, sneaky: true },
+    { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '0.10', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5, speed: 0.28, wanderRadius: 0.72, walkChance: 0.5, eatChance: 0.22, idleMin: 2.5, idleMax: 6.0 },
   ];
 
   EXTRA_LEDGER = [
@@ -479,6 +481,20 @@ class Component extends DCLogic {
     { name: 'Tank', type: 'Dog · Mix', adopter: '@0xtank', shelter: 'Second Chance Shelter', date: 'Apr 9, 2026', sol: '0.25', status: 'PAID' },
     { name: 'Noodle', type: 'Cat', adopter: '@noodlemom', shelter: 'Alley Cat Allies', date: 'Mar 27, 2026', sol: '0.20', status: 'PAID' },
   ];
+
+  assetUrl(path) {
+    const sep = path.includes('?') ? '&' : '?';
+    return path + sep + 'v=' + this.ASSET_VERSION;
+  }
+
+  rand(p) {
+    p.rng = (p.rng * 1664525 + 1013904223) >>> 0;
+    return p.rng / 4294967296;
+  }
+
+  randRange(p, min, max) {
+    return min + this.rand(p) * (max - min);
+  }
 
   // ---------- audio ----------
   blip(freq, dur) {
@@ -603,7 +619,7 @@ class Component extends DCLogic {
     const loader = new THREE.GLTFLoader(manager);
 
     this.PETS.forEach((pet, idx) => {
-      loader.load(pet.file, (gltf) => {
+      loader.load(this.assetUrl(pet.file), (gltf) => {
         const model = gltf.scene;
         model.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
         // normalize to target height, feet on ground
@@ -630,16 +646,23 @@ class Component extends DCLogic {
           idx, group, mixer, clips,
           home: new THREE.Vector3(pet.pos[0], 0, pet.pos[2]),
           state: 'idle',
-          timer: 2 + Math.random() * 5,
+          timer: 2 + idx * 0.35,
           target: new THREE.Vector3(),
           faceOffset: pet.faceOffset || 0,
+          speed: pet.speed || 0.45,
+          wanderRadius: pet.wanderRadius || 1.1,
+          walkChance: pet.walkChance ?? 0.45,
+          eatChance: pet.eatChance ?? 0.25,
+          idleMin: pet.idleMin || 3,
+          idleMax: pet.idleMax || 8,
+          rng: ((idx + 1) * 9973) >>> 0,
           current: null,
           baseScale: 1,
           hoverT: 0,
         };
         this.playClip(obj, this.pickIdle(clips), true);
         // desync animation start
-        mixer.update(Math.random() * 2);
+        mixer.update(idx * 0.23);
         this.petObjs.push(obj);
       }, undefined, () => { /* missing model: skip quietly */ });
     });
@@ -686,6 +709,12 @@ class Component extends DCLogic {
     const animate = () => {
       this.raf = requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.1);
+      const targetCamY = this.state.started ? 2.0 : 2.25;
+      const targetLookY = this.state.started ? 0.65 : 0.78;
+      const cameraEase = Math.min(dt * 1.35, 1);
+      camera.position.y += (targetCamY - camera.position.y) * cameraEase;
+      controls.target.y += (targetLookY - controls.target.y) * cameraEase;
+      controls.autoRotateSpeed = this.state.started ? 0.45 : 0.16;
       controls.update();
 
       const panelOpen = !!this.state.panel;
@@ -803,24 +832,24 @@ class Component extends DCLogic {
     p.timer -= dt;
     if (p.state === 'idle') {
       if (p.timer <= 0) {
-        const roll = Math.random();
+        const roll = this.rand(p);
         const walkClip = this.findClipName(p.clips, ['Walk', 'walk', 'run', 'fly']);
-        if (roll < 0.45 && walkClip) {
+        if (roll < p.walkChance && walkClip) {
           // pick a new spot near home
-          const a = Math.random() * Math.PI * 2;
-          const rad = 0.5 + Math.random() * 1.1;
+          const a = this.rand(p) * Math.PI * 2;
+          const rad = this.randRange(p, 0.45, p.wanderRadius);
           p.target.set(p.home.x + Math.cos(a) * rad, 0, p.home.z + Math.sin(a) * rad);
           // keep on the lawn-ish
           const d = Math.hypot(p.target.x, p.target.z);
           if (d > 3.8) p.target.multiplyScalar(3.8 / d);
           p.state = 'walk';
           this.playClip(p, walkClip);
-        } else if (roll < 0.7 && this.findClipName(p.clips, ['Eating'])) {
+        } else if (roll < p.walkChance + p.eatChance && this.findClipName(p.clips, ['Eating'])) {
           p.state = 'eat';
-          p.timer = 2.5 + Math.random() * 2;
+          p.timer = this.randRange(p, 2.5, 4.5);
           this.playClip(p, this.findClipName(p.clips, ['Eating']));
         } else {
-          p.timer = 3 + Math.random() * 5;
+          p.timer = this.randRange(p, p.idleMin, p.idleMax);
           this.playClip(p, this.pickIdle(p.clips));
         }
       }
@@ -830,7 +859,7 @@ class Component extends DCLogic {
       const dist = Math.hypot(dx, dz);
       if (dist < 0.06) {
         p.state = 'idle';
-        p.timer = 3 + Math.random() * 5;
+        p.timer = this.randRange(p, p.idleMin, p.idleMax);
         this.playClip(p, this.pickIdle(p.clips));
       } else {
         const targetRot = Math.atan2(dx, dz) + (p.faceOffset || 0);
@@ -838,14 +867,14 @@ class Component extends DCLogic {
         while (dr > Math.PI) dr -= Math.PI * 2;
         while (dr < -Math.PI) dr += Math.PI * 2;
         p.group.rotation.y += dr * Math.min(dt * 5, 1);
-        const speed = 0.45;
+        const speed = p.speed;
         p.group.position.x += (dx / dist) * speed * dt;
         p.group.position.z += (dz / dist) * speed * dt;
       }
     } else if (p.state === 'eat') {
       if (p.timer <= 0) {
         p.state = 'idle';
-        p.timer = 2 + Math.random() * 4;
+        p.timer = this.randRange(p, p.idleMin, p.idleMax);
         this.playClip(p, this.pickIdle(p.clips));
       }
     }

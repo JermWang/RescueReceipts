@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { ADMIN_COOKIE_NAME, isAdminCookieValid } from "@/lib/admin-auth";
 import { fetchAllSubmissions } from "@/lib/queries";
 import { listAllVariants, PET_COLOR_PRESETS } from "@/lib/petModelConfig";
@@ -43,7 +44,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
           <h1 className="font-display text-2xl">Admin dashboard</h1>
           <p className="text-ink-soft text-sm">Review submissions, approve, deny, mark paid.</p>
         </div>
-        <form action={logout}><button className="btn-ghost text-sm">Log out</button></form>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/models" className="btn-ghost text-sm">Model preview</Link>
+          <form action={logout}><button className="btn-ghost text-sm">Log out</button></form>
+        </div>
       </header>
 
       <form className="mt-6 grid sm:grid-cols-[1fr,auto,auto] gap-2 items-end">
