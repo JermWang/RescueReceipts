@@ -5,20 +5,20 @@ export type PetModelEntry = {
   label: string;
   path: string;
   scale: number;
-  idleAnimation: string;
+  idleAnimation: string | null;
 };
 
 // Local GLB residents used by the React Three views. The fullscreen redesign
 // serves its own copied set from /redesign/models.
 export const PET_MODELS: Record<string, PetModelEntry[]> = {
   dog: [
-    { id: "dog_01", label: "Shiba Inu", path: "/models/pets/dog_01.glb", scale: 1, idleAnimation: "Idle" },
-    { id: "dog_02", label: "Husky", path: "/models/pets/dog_02.glb", scale: 1, idleAnimation: "Idle" },
-    { id: "cat_02", label: "Wolf", path: "/models/pets/cat_02.glb", scale: 0.95, idleAnimation: "Idle" },
-    { id: "dog", label: "Rescue Mix", path: "/models/pets/dog.glb", scale: 0.9, idleAnimation: "iddle" },
+    { id: "dog_01", label: "Shiba Inu (wolf-rig, forward +Z)", path: "/models/pets/dog_01.glb", scale: 1, idleAnimation: "Idle" },
+    { id: "dog_02", label: "Husky (wolf-rig, forward +Z)", path: "/models/pets/dog_02.glb", scale: 1, idleAnimation: "Idle" },
+    { id: "cat_02", label: "Wolf (cat_02 asset, forward +Z)", path: "/models/pets/cat_02.glb", scale: 0.95, idleAnimation: "Idle" },
+    { id: "dog", label: "Rescue Mix (new rig, forward -Z)", path: "/models/pets/dog.glb", scale: 0.9, idleAnimation: "iddle" },
   ],
   cat: [
-    { id: "cat", label: "Tabby", path: "/models/pets/cat.glb", scale: 0.8, idleAnimation: "Idle" },
+    { id: "cat", label: "Tabby (skinned, no clips)", path: "/models/pets/cat.glb", scale: 0.8, idleAnimation: null },
   ],
   rabbit: [
     { id: "rabbit_01", label: "Rabbit (procedural)", path: "/models/pets/rabbit_01.glb", scale: 0.7, idleAnimation: "Idle" },
@@ -28,7 +28,7 @@ export const PET_MODELS: Record<string, PetModelEntry[]> = {
   ],
   reptile: [],
   other: [
-    { id: "chichen", label: "Chicken", path: "/models/pets/chichen.glb", scale: 0.55, idleAnimation: "Idle" },
+    { id: "chichen", label: "Chicken (skinned, no clips)", path: "/models/pets/chichen.glb", scale: 0.55, idleAnimation: null },
   ],
 };
 
@@ -61,7 +61,7 @@ export function listAllVariants(): { id: string; label: string }[] {
 
 export const IDLE_CLIP_CANDIDATES = ["Idle", "idle", "iddle", "fly", "Sit", "Stand", "Idle_A", "Idle_1"];
 
-export function pickIdleClipName(available: string[], preferred?: string): string | null {
+export function pickIdleClipName(available: string[], preferred?: string | null): string | null {
   if (!available.length) return null;
   if (preferred && available.includes(preferred)) return preferred;
   for (const c of IDLE_CLIP_CANDIDATES) if (available.includes(c)) return c;

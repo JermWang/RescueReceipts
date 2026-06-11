@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import * as THREE from "three";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useIsMobile, hasWebGL } from "@/hooks/useIsMobile";
 import { WebGLFallback } from "./WebGLFallback";
@@ -51,12 +52,17 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
             shadows
             dpr={[1, isMobile ? 1.5 : 2]}
             camera={{ position: [0, 1.6, 4.5], fov: 38 }}
+            onCreated={({ gl }) => {
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 0.78;
+            }}
           >
-            <color attach="background" args={["#f8f1e2"]} />
-            <ambientLight intensity={0.7} />
+            <color attach="background" args={["#f4dfbf"]} />
+            <hemisphereLight args={["#ffd0a3", "#6fbf8a", 0.42]} />
             <directionalLight
-              position={[3, 5, 2]}
-              intensity={1.0}
+              position={[-3, 4.8, 2.5]}
+              intensity={0.58}
+              color="#ffb36a"
               castShadow
               shadow-mapSize-width={1024}
               shadow-mapSize-height={1024}
@@ -82,7 +88,7 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
                   </group>
                 </group>
               ))}
-              <Drei.ContactShadows position={[0, -0.2, 0]} opacity={0.4} scale={20} blur={2.5} far={4} />
+              <Drei.ContactShadows position={[0, -0.2, 0]} opacity={0.34} scale={20} blur={2.5} far={4} />
               {/* Soft env if available; fail-safe */}
               <SafeEnvironment />
             </Suspense>
@@ -107,7 +113,7 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
 
 function SafeEnvironment() {
   try {
-    return <Drei.Environment preset="sunset" />;
+    return <Drei.Environment preset="sunset" environmentIntensity={0.45} />;
   } catch {
     return null;
   }

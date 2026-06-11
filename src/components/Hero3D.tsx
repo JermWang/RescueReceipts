@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import * as THREE from "three";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { hasWebGL } from "@/hooks/useIsMobile";
 
@@ -24,9 +25,17 @@ export function Hero3D() {
   }
   return (
     <div className="relative aspect-[4/3] rounded-3xl border border-ink/10 overflow-hidden bg-gradient-to-br from-cream-100 to-cream-200 shadow-soft">
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 1.4, 4.2], fov: 38 }}>
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[3, 5, 2]} intensity={1.0} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        camera={{ position: [0, 1.4, 4.2], fov: 38 }}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 0.8;
+        }}
+      >
+        <hemisphereLight args={["#ffd0a3", "#6fbf8a", 0.42]} />
+        <directionalLight position={[-3, 4.8, 2.5]} intensity={0.58} color="#ffb36a" castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
         <Suspense fallback={null}>
           <group position={[-1.0, 0, 0]}>
             <PetPlatform />
@@ -49,7 +58,7 @@ export function Hero3D() {
               <meshStandardMaterial color="#9945ff" metalness={0.4} roughness={0.4} />
             </mesh>
           </Float>
-          <ContactShadows position={[0, -0.2, 0]} opacity={0.45} scale={10} blur={2.5} far={4} />
+          <ContactShadows position={[0, -0.2, 0]} opacity={0.34} scale={10} blur={2.5} far={4} />
         </Suspense>
       </Canvas>
       <div className="absolute top-3 left-3 stamp text-warm-orange bg-white/70 rounded-md">Verified</div>

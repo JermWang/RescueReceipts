@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import { PetModel } from "./PetModel";
 import { PetPlatform } from "./PetPlatform";
 
@@ -12,7 +13,7 @@ export type ModelPreviewEntry = {
   label: string;
   path: string;
   scale: number;
-  idleAnimation: string;
+  idleAnimation: string | null;
 };
 
 export function ModelPreviewClient({ entries }: { entries: ModelPreviewEntry[] }) {
@@ -66,17 +67,25 @@ export function ModelPreviewClient({ entries }: { entries: ModelPreviewEntry[] }
 
       <section className="overflow-hidden rounded-2xl border border-ink/10 bg-gradient-to-b from-cream-50 to-cream-100">
         <div className="h-[520px]">
-          <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 1.45, 4.2], fov: 36 }}>
-            <color attach="background" args={["#f8f1e2"]} />
-            <ambientLight intensity={0.72} />
-            <directionalLight position={[3, 5, 2]} intensity={1.1} castShadow />
+          <Canvas
+            shadows
+            dpr={[1, 2]}
+            camera={{ position: [0, 1.45, 4.2], fov: 36 }}
+            onCreated={({ gl }) => {
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 0.78;
+            }}
+          >
+            <color attach="background" args={["#f4dfbf"]} />
+            <hemisphereLight args={["#ffd0a3", "#6fbf8a", 0.42]} />
+            <directionalLight position={[-3, 4.8, 2.5]} intensity={0.58} color="#ffb36a" castShadow />
             <group position={[0, -0.1, 0]}>
               <PetPlatform featured hovered selected />
               <group rotation={[0, Math.PI, 0]}>
                 <PetModel petType={selected.type} modelVariant={selected.id} selected hovered={false} />
               </group>
             </group>
-            <ContactShadows position={[0, -0.28, 0]} opacity={0.42} scale={8} blur={2.5} far={4} />
+            <ContactShadows position={[0, -0.28, 0]} opacity={0.34} scale={8} blur={2.5} far={4} />
             <OrbitControls
               enablePan={false}
               enableZoom
@@ -90,7 +99,7 @@ export function ModelPreviewClient({ entries }: { entries: ModelPreviewEntry[] }
         <div className="grid gap-2 border-t border-ink/10 bg-white/75 p-4 text-sm sm:grid-cols-2">
           <Info label="Variant" value={selected.id} />
           <Info label="Type" value={selected.type} />
-          <Info label="Idle clip" value={selected.idleAnimation} />
+          <Info label="Idle clip" value={selected.idleAnimation ?? "None exported"} />
           <Info label="Scale" value={selected.scale.toString()} />
         </div>
       </section>

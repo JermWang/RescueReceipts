@@ -37,7 +37,7 @@ export function PetModel({ petType, modelVariant, modelColor, hovered, selected 
 function GLBPet({
   path, scale, preferredClip, hovered, selected, color,
 }: {
-  path: string; scale: number; preferredClip: string; hovered?: boolean; selected?: boolean; color?: string;
+  path: string; scale: number; preferredClip: string | null; hovered?: boolean; selected?: boolean; color?: string;
 }) {
   const group = useRef<THREE.Group>(null!);
   const gltf = useGLTF(path) as any;
