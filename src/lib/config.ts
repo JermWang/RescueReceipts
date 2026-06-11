@@ -65,7 +65,7 @@ export const DEFAULT_POOL = {
 
 export const REQUIRED_CONFIRMATIONS = [
   "I confirm this is my adopted pet",
-  "I confirm my proof post is public",
+  "I confirm my proof post is public, includes a video of my pet, and tags @RescueReceipts",
   "I confirm the adoption is real",
   "I understand submissions are manually reviewed",
   "I understand bounties are not guaranteed",

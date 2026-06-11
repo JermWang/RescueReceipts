@@ -12,8 +12,8 @@ export default function SubmitPage() {
             <div className="chip-coral">Submission · Manual review</div>
             <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold">Submit your adoption proof</h1>
             <p className="text-ink-soft mt-2 text-lg">
-              Post public proof on X and tag{" "}
-              <a href={SITE.xUrl} className="underline decoration-gold decoration-2 underline-offset-2">@{SITE.xHandle}</a>, then fill this out.
+              Post a public <strong>video</strong> of your new pet on X and tag{" "}
+              <a href={SITE.xUrl} className="underline decoration-gold decoration-2 underline-offset-2">@{SITE.xHandle}</a>, then tell us about them below.
             </p>
           </header>
         </div>

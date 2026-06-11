@@ -17,7 +17,7 @@ export default function HowItWorksPage() {
       <ol className="mt-8 space-y-5">
         {[
           { t: "Adopt responsibly", d: "Adopt from a shelter or rescue. Be ready for years of care — food, vet visits, time, patience." },
-          { t: "Post public proof", d: `Make a public X/Twitter post tagging @${SITE.xHandle}. Include the pet's name, optionally the shelter, and why you adopted.` },
+          { t: "Post video proof", d: `Make a public X/Twitter post with a short video of your new pet, tagging @${SITE.xHandle}. Include the pet's name, optionally the shelter, and why you adopted. Photos alone don't count.` },
           { t: "Submit your proof", d: "Paste the post URL, your Solana wallet, and the basic details on the submission page." },
           { t: "Manual review", d: "A human reviews every submission. We check the post is public, the proof looks real, and there are no duplicates or red flags." },
           { t: "Approved receipt", d: "If approved, your receipt becomes public and your pet may appear in the Adoption Park." },
@@ -37,7 +37,7 @@ export default function HowItWorksPage() {
         <div className="rounded-2xl border border-soft-green/40 bg-soft-green/10 p-5">
           <div className="font-semibold text-soft-greenDark">Good proof</div>
           <ul className="mt-2 text-sm text-ink-soft list-disc pl-5 space-y-1">
-            <li>Short video introducing your adopted pet</li>
+            <li>Short video introducing your adopted pet (required)</li>
             <li>Public X post tagging @{SITE.xHandle}</li>
             <li>Mention the pet's name</li>
             <li>Mention the shelter/rescue if comfortable</li>
@@ -49,6 +49,7 @@ export default function HowItWorksPage() {
           <div className="font-semibold text-rose-800">Bad proof</div>
           <ul className="mt-2 text-sm text-ink-soft list-disc pl-5 space-y-1">
             <li>Private or deleted posts</li>
+            <li>Photo-only posts with no video</li>
             <li>No clear pet or adoption proof</li>
             <li>Reused or stolen videos</li>
             <li>Wallet-farming patterns</li>

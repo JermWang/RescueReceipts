@@ -65,11 +65,35 @@ export function SubmitForm() {
     );
   }
 
+  const postIntentUrl =
+    "https://x.com/intent/post?text=" +
+    encodeURIComponent(`We just adopted our new best friend 🐾 Proof video below — @${SITE.xHandle}`);
+
   return (
     <form onSubmit={onSubmit} className="receipt-card p-6 sm:p-8 space-y-5">
+      <div className="rounded-2xl border-[2.5px] border-dashed border-soft-green/60 bg-soft-green/10 p-4 sm:p-5">
+        <div className="font-display font-bold text-lg">Step 1 — Post your video proof on X</div>
+        <ul className="mt-2 text-sm text-ink-soft list-disc pl-5 space-y-1">
+          <li>Record a short <strong>video</strong> with your newly adopted pet — photos alone don&apos;t count.</li>
+          <li>Post it <strong>publicly</strong> on X and <strong>tag @{SITE.xHandle}</strong>.</li>
+          <li>Mention your pet&apos;s name, and the shelter or rescue if you&apos;re comfortable.</li>
+        </ul>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a href={postIntentUrl} target="_blank" rel="noreferrer" className="btn-primary text-sm">Post your video on X</a>
+          <a href={SITE.xUrl} target="_blank" rel="noreferrer" className="btn-secondary text-sm">@{SITE.xHandle} ↗</a>
+        </div>
+      </div>
+
+      <div>
+        <div className="font-display font-bold text-lg">Step 2 — Tell us about your pet</div>
+        <p className="text-sm text-ink-soft mt-1">
+          We need these details to verify your post and build your pet&apos;s receipt. Every submission is reviewed by a human.
+        </p>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-4">
         <Field name="x_handle" label="X / Twitter handle" placeholder="@username" error={errors.x_handle} />
-        <Field name="x_post_url" label="X / Twitter proof post URL" placeholder="https://x.com/you/status/123…" error={errors.x_post_url} />
+        <Field name="x_post_url" label="Video proof post URL" placeholder="https://x.com/you/status/123…" error={errors.x_post_url} />
       </div>
       <Field name="wallet_address" label="Solana wallet address" placeholder="Solana public key" error={errors.wallet_address} />
       <div className="grid sm:grid-cols-2 gap-4">

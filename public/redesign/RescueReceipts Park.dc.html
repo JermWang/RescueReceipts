@@ -165,6 +165,9 @@
       z-index: 12;
       animation: popIn 0.5s 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
+    /* text fields must shrink with their grid cells on narrow screens
+       (inline 17px width on checkboxes still wins over this rule) */
+    form label > input, form label > select, form label > textarea { width: 100%; min-width: 0; box-sizing: border-box; }
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background: #7FD99A; border-radius: 99px; border: 2px solid #fff; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -343,12 +346,25 @@
 
         <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
           <form onSubmit="{{ handleSubmit }}" style="padding: 20px 22px 26px; display: flex; flex-direction: column; gap: 14px;">
-            <div style="background: #F4FBF6; border: 2.5px dashed #7FD99A; border-radius: 14px; padding: 10px 14px; font-size: 13.5px; font-weight: 700; color: #33505C; line-height: 1.5;">Adopt from a shelter → post proof on X and tag @RescueReceipts → drop the link here. Manual review, no promises, real pets only.</div>
+            <div style="background: #F4FBF6; border: 2.5px dashed #7FD99A; border-radius: 14px; padding: 12px 14px 14px; font-size: 13.5px; font-weight: 700; color: #33505C; line-height: 1.5;">
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; color: #1F3038;">Step 1 — Post your video proof on X</div>
+              <ul style="margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px;">
+                <li>Record a short <b>video</b> with your newly adopted pet — photos alone don't count.</li>
+                <li>Post it <b>publicly</b> on X and <b>tag @RescueReceipts</b>.</li>
+                <li>Mention your pet's name, and the shelter or rescue if you're comfortable.</li>
+              </ul>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                <a href="https://x.com/intent/post?text=We%20just%20adopted%20our%20new%20best%20friend%20%F0%9F%90%BE%20Proof%20video%20below%20%E2%80%94%20%40RescueReceipts" target="_blank" rel="noreferrer" style="background: #1F3038; color: #fff; border: 2.5px solid #1F3038; border-radius: 999px; padding: 7px 16px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: 0 3px 0 rgba(31,48,56,0.4);">Post your video on X</a>
+                <a href="https://x.com/RescueReceipts" target="_blank" rel="noreferrer" style="background: #fff; color: #1F3038; border: 2.5px solid #1F3038; border-radius: 999px; padding: 7px 16px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 14px; text-decoration: none; box-shadow: 0 3px 0 #1F3038;">@RescueReceipts ↗</a>
+              </div>
+            </div>
+            <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; color: #1F3038;">Step 2 — Tell us about your pet</div>
+            <div style="margin-top: -8px; font-size: 13px; font-weight: 700; color: #4A6470;">We need these details to verify your post and build your pet's receipt. Manual review, no promises, real pets only.</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">X handle
                 <input name="x_handle" required placeholder="@username" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
               </label>
-              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Proof post URL
+              <label style="display: flex; flex-direction: column; gap: 5px; font-weight: 800; font-size: 13.5px; color: #33505C;">Video post URL
                 <input name="x_post_url" required placeholder="https://x.com/…/status/…" style="border: 3px solid #1F3038; border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; background: #FDFEFD; outline: none;" style-focus="border-color: #3FA868; background: #fff;">
               </label>
             </div>
@@ -383,7 +399,7 @@
             <fieldset style="border: 3px solid #1F3038; border-radius: 16px; padding: 12px 16px 14px; margin: 0; background: #FFFBEF;">
               <legend style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; padding: 0 8px;">Pinky promises</legend>
               <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">This is my real, adopted pet and my proof post is public</label>
+                <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">This is my real, adopted pet and my public proof post includes a video and tags @RescueReceipts</label>
                 <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">I understand every submission is manually reviewed and bounties are not guaranteed</label>
                 <label style="display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 700; color: #33505C; cursor: pointer;"><input type="checkbox" required style="margin-top: 2px; width: 17px; height: 17px; accent-color: #3FA868;">Pets are a long-term responsibility — I didn't adopt just for a reward</label>
               </div>
@@ -488,7 +504,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #F4FBF6;">
             <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #7FD99A; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">2</span>
-            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Post public proof</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">Share your adoption on X and tag @RescueReceipts.</div></div>
+            <div><div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px;">Post video proof</div><div style="font-size: 14px; font-weight: 700; color: #4A6470;">Record a short video with your new pet, post it publicly on X and tag @RescueReceipts.</div></div>
           </div>
           <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 13px 16px; background: #F4FBF6;">
             <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: #7FD99A; border: 3px solid #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; flex-shrink: 0;">3</span>
