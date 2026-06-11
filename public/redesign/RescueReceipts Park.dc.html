@@ -300,7 +300,10 @@
     <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; z-index: 50; background: rgba(31,48,56,0.35); display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s both;">
       <div onClick="{{ swallow }}" style="position: relative; width: 460px; max-width: 94vw; max-height: 86vh; overflow: auto; background: #fff; border: 4px solid #1F3038; border-radius: 26px; box-shadow: 0 10px 0 rgba(31,48,56,0.55); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
         <div style="background: #7FD99A; border-bottom: 4px solid #1F3038; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: sticky; top: 0; z-index: 2;">
-          <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">{{ petName }}'s Receipt</div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px;">{{ petName }}'s Receipt</span>
+            <span style="background: rgba(31,48,56,0.9); color: #fff; border: 2px solid #1F3038; border-radius: 999px; padding: 2px 9px 3px; font-family: 'Nunito', sans-serif; font-weight: 1000; font-size: 10px; letter-spacing: 0.13em;">DEMO</span>
+          </div>
           <button onClick="{{ closePanel }}" style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 3px 0 #1F3038; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">✕</button>
         </div>
         <div style="padding: 20px 22px 24px;">
@@ -434,7 +437,11 @@
             <div style="display: flex; align-items: center; gap: 14px; border: 3px solid #1F3038; border-radius: 18px; padding: 12px 16px; background: linear-gradient(180deg, #FFFFFF 0%, #F4FBF6 100%); box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
               <div style="width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; background: {{ r.avatarBg }}; border: 3px solid #1F3038; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px;">{{ r.initial }}</div>
               <div style="flex: 1; min-width: 0;">
-                <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ r.name }} <span style="font-size: 13px; font-weight: 700; color: #4A6470;">· {{ r.type }}</span></div>
+                <div style="display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap;">
+                  <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ r.name }}</span>
+                  <span style="background: rgba(31,48,56,0.9); color: #fff; border-radius: 999px; padding: 2px 8px 3px; font-weight: 1000; font-size: 9px; letter-spacing: 0.12em;">DEMO</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #4A6470;">· {{ r.type }}</span>
+                </div>
                 <div style="font-size: 13.5px; font-weight: 700; color: #4A6470; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.adopter }} · {{ r.shelter }} · {{ r.date }}</div>
               </div>
               <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
@@ -581,7 +588,6 @@ class Component extends DCLogic {
     { file: 'models/dog_02.glb', modelId: 'husky_wolf_rig', name: 'Juniper', type: 'Dog · Husky', adopter: '@trailwithcole', shelter: 'Northside Animal Shelter', location: 'Denver, CO', date: 'May 28, 2026', sol: '3.75', status: 'PAID', story: 'Three years in the shelter system. First week home she learned the word "hike" and never forgot it.', pos: [2.2, 0, -0.3], h: 1.05, rot: -0.6, faceOffset: 0, speed: 0.5, wanderRadius: 1.45, walkChance: 0.56, eatChance: 0.1, idleMin: 2.2, idleMax: 5.6 },
     { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Mochi', type: 'Cat', adopter: '@kenj_dev', shelter: 'Whisker Haven', location: 'Seattle, WA', date: 'Jun 2, 2026', sol: '2.65', status: 'PAID', story: 'Adopted as an office cat. Promoted to CEO within the hour.', pos: [-0.9, 0, -1.6], h: 0.72, rot: 0.2, faceOffset: 0, speed: 0.36, wanderRadius: 0.95, walkChance: 0.42, eatChance: 0.12, idleMin: 3.4, idleMax: 7.4, sneaky: true },
     { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Pixel', type: 'Cat', adopter: '@softpixels', shelter: 'City Paws Rescue', location: 'Brooklyn, NY', date: 'Jun 6, 2026', sol: '3.10', status: 'PAID', story: 'The shelter said "shy". Pixel said otherwise the moment the treat bag opened.', pos: [0.8, 0, 1.3], h: 0.7, rot: -0.3, faceOffset: 0, speed: 0.38, wanderRadius: 0.9, walkChance: 0.46, eatChance: 0.14, idleMin: 2.8, idleMax: 6.6, sneaky: true },
-    { file: 'models/bird_01.glb', name: 'Crumb', type: 'Bird · Pigeon', adopter: '@planted_jane', shelter: 'Wing & A Prayer', location: 'Portland, OR', date: 'Apr 30, 2026', sol: '2.40', status: 'PAID', story: 'Rescued with a broken wing. Healed up, refused to leave. Honestly, fair.', pos: [0.1, 0, -0.2], h: 0.45, rot: 0.1, modelLift: 0.14, speed: 0.32, wanderRadius: 0.8, walkChance: 0.36, eatChance: 0.2, idleMin: 3.2, idleMax: 7.8 },
     { file: 'models/dog.glb', modelId: 'rescue_mix_new_rig', name: 'Ranger', type: 'Dog · Rescue Mix', adopter: '@park_ranger', shelter: 'Sunbeam Rescue', location: 'Phoenix, AZ', date: 'Jun 8, 2026', sol: '3.45', status: 'PAID', story: 'Big paws, bigger feelings. Ranger picked his human by sitting directly on their shoes.', pos: [-3.0, 0, -1.0], h: 0.86, rot: 0.9, faceOffset: Math.PI, speed: 0.42, wanderRadius: 1.05, walkChance: 0.48, eatChance: 0.18, idleMin: 3.0, idleMax: 6.8 },
     { file: 'models/cat.glb', modelId: 'tabby_static_rig', name: 'Clover', type: 'Cat · Tabby', adopter: '@cloverclub', shelter: 'Tiny Whiskers', location: 'Madison, WI', date: 'Jun 9, 2026', sol: '2.95', status: 'PAID', story: 'Clover arrived quiet, inspected every sunny window, and approved the adoption paperwork herself.', pos: [2.9, 0, 1.2], h: 0.72, rot: -0.8, faceOffset: 0, speed: 0.34, wanderRadius: 0.85, walkChance: 0.4, eatChance: 0.16, idleMin: 3.6, idleMax: 8.0, sneaky: true },
     { file: 'models/chichen.glb', name: 'Nugget', type: 'Chicken', adopter: '@coop_keeper', shelter: 'Backyard Barn Rescue', location: 'Nashville, TN', date: 'Jun 1, 2026', sol: '2.10', status: 'PAID', story: 'Not every rescue receipt has paws. Nugget now runs breakfast operations with confidence.', pos: [-1.7, 0, 1.8], h: 0.5, rot: 1.5, faceOffset: Math.PI, speed: 0.28, wanderRadius: 0.72, walkChance: 0.5, eatChance: 0.22, idleMin: 2.5, idleMax: 6.0 },
@@ -611,6 +617,16 @@ class Component extends DCLogic {
     if (!address) return 'Contract TBA';
     if (address.length <= 16) return address;
     return address.slice(0, 6) + '...' + address.slice(-6);
+  }
+
+  escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    })[ch]);
   }
 
   copyContract = async (e) => {
@@ -965,7 +981,7 @@ class Component extends DCLogic {
             this.tag.style.left = ((v3.x + 1) / 2) * r.width + 'px';
             this.tag.style.top = ((-v3.y + 1) / 2) * r.height - 8 + 'px';
             this.tag.style.display = 'block';
-            this.tag.textContent = pet.name + ' · ' + pet.type;
+            this.tag.innerHTML = this.escapeHtml(pet.name + ' · ' + pet.type) + ' <span style="display:inline-flex;vertical-align:middle;margin-left:7px;background:rgba(31,48,56,0.9);color:#fff;border-radius:999px;padding:1px 7px 2px;font-family:Nunito,sans-serif;font-weight:1000;font-size:9px;letter-spacing:0.12em;">DEMO</span>';
           }
         } else {
           this.tag.style.display = 'none';
