@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SITE } from "@/lib/config";
 
 export const metadata = { title: `How it works - ${SITE.name}` };
@@ -127,7 +128,7 @@ export default function HowItWorksPage() {
   return (
     <div>
       <div className="page-hero">
-        <div className="section grid gap-10 py-12 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:py-16">
+        <div className="section grid gap-10 py-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1fr)] lg:items-center lg:py-16">
           <header className="max-w-3xl">
             <div className="chip-green">Human reviewed adoption receipts</div>
             <h1 className="mt-4 font-display text-4xl font-bold leading-[0.98] sm:text-6xl">
@@ -144,25 +145,28 @@ export default function HowItWorksPage() {
                 View public receipts
               </Link>
             </div>
+            <div className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-ink-mid">
+              <span className="h-3 w-3 rounded-full bg-gradient-to-br from-sol-purple to-sol-green" aria-hidden />
+              Built on Solana
+            </div>
           </header>
 
-          <aside className="receipt-card receipt-edge p-6">
-            <div className="flex items-center justify-between gap-4 border-b border-dashed border-ink/20 pb-4">
-              <div>
-                <div className="font-display text-2xl font-bold">Receipt loop</div>
-                <p className="mt-1 text-sm text-ink-soft">Simple, public, reviewed.</p>
+          <aside className="relative">
+            <div className="absolute -left-5 top-8 hidden h-24 w-24 rounded-full bg-soft-green/25 blur-2xl lg:block" aria-hidden />
+            <Image
+              src="/how-it-works/hero-receipt-pets.png"
+              alt="Illustration of an adoption receipt beside a dog, cat, and Solana coin"
+              width={1536}
+              height={1024}
+              priority
+              className="relative w-full rounded-[28px] mix-blend-multiply"
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
+            <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-ink/10 bg-white/80 px-4 py-3 shadow-receipt backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-display text-lg font-bold">Simple, public, reviewed.</span>
+                <span className="stamp !px-2 !py-1 text-[0.58rem] text-soft-greenDark">Verified</span>
               </div>
-              <div className="stamp text-soft-greenDark">Verified</div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {["Adopt", "Post video", "Get reviewed", "Receipt", "Possible SOL bounty"].map((item, index) => (
-                <div key={item} className="flex items-center gap-3 rounded-xl bg-white/70 px-3 py-2 ring-1 ring-ink/10">
-                  <div className="grid h-8 w-8 place-items-center rounded-full bg-gold font-display font-bold text-ink shadow-popSm">
-                    {index + 1}
-                  </div>
-                  <span className="text-sm font-extrabold text-ink-mid">{item}</span>
-                </div>
-              ))}
             </div>
           </aside>
         </div>
@@ -189,22 +193,34 @@ export default function HowItWorksPage() {
             </p>
           </div>
 
-          <ol className="relative space-y-4">
-            <span className="absolute bottom-8 left-[22px] top-8 hidden w-0.5 bg-ink/10 sm:block" aria-hidden />
-            {flowSteps.map((step, index) => (
-              <li key={step.title} className="relative rounded-2xl border-[1.5px] border-ink/10 bg-white/75 p-5 shadow-receipt">
-                <div className="flex gap-4">
-                  <div className="z-10 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold font-display text-xl font-bold text-ink shadow-popSm">
-                    {index + 1}
+          <div>
+            <div className="overflow-hidden rounded-[28px] border-[1.5px] border-ink/10 bg-cream-50 shadow-soft">
+              <Image
+                src="/how-it-works/six-step-flywheel.png"
+                alt="Illustrated six-step adoption receipt flywheel"
+                width={1919}
+                height={820}
+                className="w-full"
+                sizes="(min-width: 1024px) 760px, 100vw"
+              />
+            </div>
+            <ol className="relative mt-5 space-y-4">
+              <span className="absolute bottom-8 left-[22px] top-8 hidden w-0.5 bg-ink/10 sm:block" aria-hidden />
+              {flowSteps.map((step, index) => (
+                <li key={step.title} className="relative rounded-2xl border-[1.5px] border-ink/10 bg-white/75 p-5 shadow-receipt">
+                  <div className="flex gap-4">
+                    <div className="z-10 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold font-display text-xl font-bold text-ink shadow-popSm">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-display text-xl font-bold">{step.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-ink-soft">{step.detail}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-display text-xl font-bold">{step.title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-ink-soft">{step.detail}</p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
         <section className="mt-16 rounded-3xl border-[1.5px] border-ink/10 bg-cream-50/80 p-5 shadow-soft sm:p-7">
@@ -252,6 +268,17 @@ export default function HowItWorksPage() {
             <p className="mt-3 text-ink-soft">
               RescueReceipts is designed to reward real adoption stories without turning pets into a farming mechanic.
             </p>
+          </div>
+
+          <div className="mt-6 overflow-hidden rounded-[28px] border-[1.5px] border-ink/10 bg-cream-50 shadow-soft">
+            <Image
+              src="/how-it-works/approval-outcomes.png"
+              alt="Illustrations of a public receipt, Adoption Park, and Solana bounty coin"
+              width={1824}
+              height={862}
+              className="w-full"
+              sizes="100vw"
+            />
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
