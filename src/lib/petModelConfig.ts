@@ -29,7 +29,6 @@ export const PET_MODELS: Record<string, PetModelEntry[]> = {
   reptile: [],
   other: [
     { id: "chichen", label: "Chicken", path: "/models/pets/chichen.glb", scale: 0.55, idleAnimation: "Idle" },
-    { id: "butterfly", label: "Butterfly", path: "/models/pets/butterfly.glb", scale: 0.35, idleAnimation: "fly" },
   ],
 };
 
