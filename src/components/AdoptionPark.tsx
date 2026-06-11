@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import * as THREE from "three";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -23,8 +23,24 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
   const [webgl, setWebgl] = useState(true);
   const [active, setActive] = useState<PublicReceipt | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [cameraIdle, setCameraIdle] = useState(false);
+  const cameraIdleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setWebgl(hasWebGL()); }, []);
+  const markCameraActivity = useCallback(() => {
+    setCameraIdle(false);
+    if (cameraIdleTimer.current) clearTimeout(cameraIdleTimer.current);
+    if (!reduced) {
+      cameraIdleTimer.current = setTimeout(() => setCameraIdle(true), 3000);
+    }
+  }, [reduced]);
+
+  useEffect(() => {
+    markCameraActivity();
+    return () => {
+      if (cameraIdleTimer.current) clearTimeout(cameraIdleTimer.current);
+    };
+  }, [markCameraActivity]);
 
   const displayed = useMemo(() => {
     if (!receipts.length) return [];
@@ -46,7 +62,12 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
 
   return (
     <div className="relative">
-      <div className={`rounded-3xl overflow-hidden border border-ink/10 bg-gradient-to-b from-cream-50 to-cream-100 shadow-soft ${compact ? "h-[360px]" : "h-[520px]"}`}>
+      <div
+        className={`rounded-3xl overflow-hidden border border-ink/10 bg-gradient-to-b from-cream-50 to-cream-100 shadow-soft ${compact ? "h-[360px]" : "h-[520px]"}`}
+        onPointerDown={markCameraActivity}
+        onWheel={markCameraActivity}
+        onTouchStart={markCameraActivity}
+      >
         <Suspense fallback={<ParkSkeleton />}>
           <Canvas
             shadows
@@ -94,9 +115,13 @@ export function AdoptionPark({ receipts, compact = false }: { receipts: PublicRe
             </Suspense>
             <Drei.OrbitControls
               enablePan={false}
-              enableZoom={false}
-              autoRotate={!reduced}
+              enableZoom
+              minDistance={3.2}
+              maxDistance={8.5}
+              zoomSpeed={0.72}
+              autoRotate={!reduced && cameraIdle}
               autoRotateSpeed={0.6}
+              onStart={markCameraActivity}
               maxPolarAngle={Math.PI / 2.1}
               minPolarAngle={Math.PI / 3}
             />

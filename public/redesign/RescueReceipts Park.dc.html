@@ -648,6 +648,7 @@ class Component extends DCLogic {
     if (this.raf) cancelAnimationFrame(this.raf);
     if (this.renderer) this.renderer.dispose();
     if (this.resizeObs) this.resizeObs.disconnect();
+    if (this.cleanupCameraControls) this.cleanupCameraControls();
   }
 
   // ---------- three.js scene ----------
@@ -679,14 +680,35 @@ class Component extends DCLogic {
     const controls = new THREE.OrbitControls(camera, canvas);
     controls.target.set(0, 0.65, 0);
     controls.enablePan = false;
-    controls.enableZoom = false;
+    controls.enableZoom = true;
+    controls.minDistance = 4.2;
+    controls.maxDistance = 10.5;
+    controls.zoomSpeed = 0.72;
     controls.maxPolarAngle = Math.PI / 2.15;
     controls.minPolarAngle = Math.PI / 3.4;
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    controls.autoRotate = !reduced;
+    controls.autoRotate = false;
     controls.autoRotateSpeed = 0.45;
     controls.update();
     this.controls = controls;
+    this.cameraIdleDelay = 3000;
+    this.lastCameraInteraction = performance.now();
+    const markCameraInteraction = () => {
+      this.lastCameraInteraction = performance.now();
+      controls.autoRotate = false;
+    };
+    controls.addEventListener('start', markCameraInteraction);
+    canvas.addEventListener('pointerdown', markCameraInteraction, { passive: true });
+    canvas.addEventListener('wheel', markCameraInteraction, { passive: true });
+    canvas.addEventListener('touchstart', markCameraInteraction, { passive: true });
+    window.addEventListener('keydown', markCameraInteraction);
+    this.cleanupCameraControls = () => {
+      controls.removeEventListener('start', markCameraInteraction);
+      canvas.removeEventListener('pointerdown', markCameraInteraction);
+      canvas.removeEventListener('wheel', markCameraInteraction);
+      canvas.removeEventListener('touchstart', markCameraInteraction);
+      window.removeEventListener('keydown', markCameraInteraction);
+    };
 
     // lights
     scene.add(new THREE.HemisphereLight(0xffd0a3, 0x6fbf8a, 0.52));
@@ -828,6 +850,7 @@ class Component extends DCLogic {
       const cameraEase = Math.min(dt * 1.35, 1);
       camera.position.y += (targetCamY - camera.position.y) * cameraEase;
       controls.target.y += (targetLookY - controls.target.y) * cameraEase;
+      controls.autoRotate = !reduced && performance.now() - (this.lastCameraInteraction || 0) >= this.cameraIdleDelay;
       controls.autoRotateSpeed = this.state.started ? 0.45 : 0.16;
       controls.update();
 
