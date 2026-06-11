@@ -16,14 +16,21 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://rescuereceipts.xyz"),
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.subtagline,
   openGraph: {
     title: SITE.name,
     description: SITE.subtagline,
     type: "website",
+    images: [{ url: "/rescue-receipts-banner.png", width: 1500, height: 500, alt: SITE.name }],
   },
-  twitter: { card: "summary_large_image", title: SITE.name, description: SITE.subtagline },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.name,
+    description: SITE.subtagline,
+    images: ["/rescue-receipts-banner.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

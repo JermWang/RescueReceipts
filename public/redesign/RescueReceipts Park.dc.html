@@ -171,6 +171,11 @@
     ::-webkit-scrollbar { width: 10px; }
     ::-webkit-scrollbar-thumb { background: #7FD99A; border-radius: 99px; border: 2px solid #fff; }
     ::-webkit-scrollbar-track { background: transparent; }
+    /* tablet: not enough room for the corner pill beside the centered menu,
+       so it joins the menu row instead */
+    @media (max-width: 1100px) and (min-width: 641px) {
+      .rr-corner-contract { position: static; }
+    }
     @media (max-width: 640px) {
       .rr-logo-plaque { top: 8px !important; left: 8px !important; transform: scale(0.72); transform-origin: top left; }
       .rr-top-hud { top: 10px !important; right: 8px !important; left: 132px !important; gap: 6px !important; justify-content: flex-end; flex-wrap: wrap; }
@@ -232,12 +237,12 @@
   <div class="rr-top-hud" style="position: absolute; top: 22px; right: 18px; z-index: 10; display: {{ gameFlexDisplay }}; align-items: center; gap: 12px; animation: popIn 0.5s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both;">
     <div title="Live bounty pool" style="display: flex; align-items: center; gap: 9px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 18px 8px 12px;">
       <img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
-      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">12.4 <span style="font-size: 13px; color: #4A6470;">SOL POOL</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ hudPoolSol }} <span style="font-size: 13px; color: #4A6470;">SOL POOL</span></span>
     </div>
     <div title="Verified adoptions" style="display: none; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;" class="hud-paw-pill"></div>
     <div style="display: flex; align-items: center; gap: 8px; background: #fff; border: 3px solid #1F3038; border-radius: 999px; box-shadow: 0 4px 0 #1F3038; padding: 8px 16px;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#1F3038"><circle cx="8" cy="14" r="3.4"></circle><circle cx="16" cy="14" r="3.4"></circle><circle cx="6" cy="8.6" r="2.5"></circle><circle cx="12" cy="7" r="2.6"></circle><circle cx="18" cy="8.6" r="2.5"></circle></svg>
-      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">27 <span style="font-size: 13px; color: #4A6470;">ADOPTED</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px;">{{ hudAdopted }} <span style="font-size: 13px; color: #4A6470;">ADOPTED</span></span>
     </div>
     <button onClick="{{ toggleSound }}" title="Toggle sound" style="width: 50px; height: 50px; border-radius: 50%; background: #fff; border: 3px solid #1F3038; box-shadow: 0 4px 0 #1F3038; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.1s, box-shadow 0.1s;" style-hover="transform: translateY(-2px); box-shadow: 0 6px 0 #1F3038;" style-active="transform: translateY(2px); box-shadow: 0 1px 0 #1F3038;">
       <sc-if value="{{ soundOn }}" hint-placeholder-val="{{ true }}">
@@ -455,15 +460,15 @@
         <div style="padding: 20px 22px 26px;">
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #FFFBEF; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #1F3038;"><img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;">12.4</div>
+              <div style="display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #1F3038;"><img src="uploads/solana-logomark.png?v=20260611d" alt="Solana" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;">{{ hudPoolSol }}</div>
               <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN THE POOL</div>
             </div>
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F4FBF6; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #3FA868;">23</div>
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #3FA868;">{{ hudPaid }}</div>
               <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">BOUNTIES PAID</div>
             </div>
             <div style="border: 3px solid #1F3038; border-radius: 18px; padding: 14px 10px; text-align: center; background: #F2F0FD; box-shadow: 0 4px 0 rgba(31,48,56,0.18);">
-              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #7C3AED;">4</div>
+              <div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; color: #7C3AED;">{{ hudReview }}</div>
               <div style="font-weight: 800; font-size: 12px; letter-spacing: 0.06em; color: #4A6470;">IN REVIEW</div>
             </div>
           </div>
@@ -562,6 +567,11 @@ class Component extends DCLogic {
     started: false,
     contractAddress: '',
     contractCopied: false,
+    // demo numbers; overwritten by /api/public-config stats once real receipts exist
+    poolSol: '12.4',
+    adoptedCount: 27,
+    paidCount: 23,
+    reviewCount: 4,
   };
 
   PETS = [
@@ -653,6 +663,16 @@ class Component extends DCLogic {
       .then((cfg) => {
         if (cfg && typeof cfg.contractAddress === 'string') {
           this.setState({ contractAddress: cfg.contractAddress.trim() });
+        }
+        const st = cfg && cfg.stats;
+        // only swap off the demo numbers once there is real activity to show
+        if (st && (Number(st.adopted) > 0 || Number(st.poolSol) > 0)) {
+          this.setState({
+            poolSol: String(Math.round(Number(st.poolSol) * 100) / 100),
+            adoptedCount: Number(st.adopted) || 0,
+            paidCount: Number(st.paid) || 0,
+            reviewCount: Number(st.inReview) || 0,
+          });
         }
       })
       .catch(() => {});
@@ -1102,6 +1122,10 @@ class Component extends DCLogic {
       gameFlexDisplay: s.started ? 'flex' : 'none',
       loadingText: s.webglFail ? 'The park needs WebGL to render — menus still work!' : 'Opening the park…',
       loadingPct: s.loaded ? '100%' : '62%',
+      hudPoolSol: s.poolSol,
+      hudAdopted: s.adoptedCount,
+      hudPaid: s.paidCount,
+      hudReview: s.reviewCount,
       contractDisplay: this.shortAddress(s.contractAddress),
       contractTitle: s.contractAddress ? 'Click to copy contract address' : 'Contract address coming soon',
       contractCopyLabel: s.contractAddress ? (s.contractCopied ? 'Copied' : 'Copy') : 'Soon',

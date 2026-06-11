@@ -4,7 +4,7 @@ import { PET_TYPES } from "./config";
 
 const petTypeValues = PET_TYPES.map((p) => p.value) as [string, ...string[]];
 
-const xUrlRegex = /^https?:\/\/(?:www\.)?(?:x\.com|twitter\.com)\/[A-Za-z0-9_]{1,15}\/status\/\d{5,}/i;
+const xUrlRegex = /^https?:\/\/(?:www\.)?(?:x\.com|twitter\.com)\/([A-Za-z0-9_]{1,15})\/status\/(\d{5,})/i;
 const xHandleRegex = /^@?[A-Za-z0-9_]{1,15}$/;
 
 export const submissionSchema = z.object({
@@ -18,7 +18,13 @@ export const submissionSchema = z.object({
     .string()
     .trim()
     .url("Must be a URL")
-    .regex(xUrlRegex, "Must be a public X/Twitter post URL"),
+    .regex(xUrlRegex, "Must be a public X/Twitter post URL")
+    // canonicalize so ?s=20 tracking params, www., twitter.com, and handle
+    // casing can't sneak the same post past the duplicate check
+    .transform((s) => {
+      const m = xUrlRegex.exec(s)!;
+      return `https://x.com/${m[1].toLowerCase()}/status/${m[2]}`;
+    }),
   wallet_address: z
     .string()
     .trim()
